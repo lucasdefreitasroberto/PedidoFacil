@@ -1,6 +1,8 @@
-## PedidoApp
+## PedidoFacil
 
-**PedidoApp** é um aplicativo móvel completo, desenvolvido para gerenciar pedidos de venda e cadastro de clientes. O aplicativo foi projetado para funcionar tanto online quanto offline, garantindo que os usuários possam continuar a registrar informações mesmo sem conexão com a internet. Quando a conectividade é restaurada, os dados são sincronizados automaticamente com o banco de dados central.
+**PedidoFacil** é um aplicativo móvel completo, desenvolvido para gerenciar pedidos de venda e cadastro de clientes. 
+<br>O aplicativo foi projetado para funcionar tanto online quanto offline, garantindo que os usuários possam continuar a registrar informações mesmo sem conexão com a internet. 
+<br>Quando a conectividade é restaurada, o usuario poder realizar a sincronização dos registro realizados, e importando para sistema de gestão de dados.
 
 ### Funcionalidades Principais
 
@@ -10,66 +12,11 @@
 - **Operação Offline:** Continue a usar o aplicativo sem interrupções, mesmo sem acesso à internet. Todos os dados serão armazenados localmente e sincronizados posteriormente.
 - **Interface Intuitiva:** Design de interface de usuário simples e fácil de usar para garantir uma experiência fluida.
 
-### Tecnologias Utilizadas
+### Figma
 
-- **Frontend:** Desenvolvido com [React Native / Flutter] (escolha sua tecnologia preferida) para criar uma interface de usuário responsiva e nativa.
-- **Backend:** Implementado com [Node.js / Django / etc.] (escolha sua tecnologia preferida) para gerenciar a lógica de negócios e a comunicação com o banco de dados.
-- **Banco de Dados:** [Firebase / SQLite / Realm / etc.] (escolha sua tecnologia preferida) para armazenamento de dados local e remoto.
-- **Sincronização de Dados:** Implementada para garantir a consistência dos dados entre o modo offline e o banco de dados central.
-
-### Como Executar o Projeto
-
-1. **Clone o Repositório:**
-    ```bash
-    git clone https://github.com/seu-usuario/PedidoApp.git
-    cd PedidoApp
-    ```
-
-2. **Instale as Dependências do Frontend:**
-    ```bash
-    cd frontend
-    npm install
-    # ou
-    yarn install
-    ```
-
-3. **Instale as Dependências do Backend:**
-    ```bash
-    cd backend
-    npm install
-    # ou
-    yarn install
-    ```
-
-4. **Execute o Servidor Backend:**
-    ```bash
-    npm start
-    # ou
-    yarn start
-    ```
-
-5. **Execute o Aplicativo Mobile:**
-    ```bash
-    cd frontend
-    npx react-native run-android
-    # ou
-    npx react-native run-ios
-    ```
-
-### Contribuição
-
-Sinta-se à vontade para contribuir com o projeto. Para começar:
-
-1. Faça um fork do repositório.
-2. Crie uma nova branch: `git checkout -b minha-nova-funcionalidade`.
-3. Faça suas alterações e commit: `git commit -m 'Adicionei uma nova funcionalidade'`.
-4. Envie para a branch principal: `git push origin minha-nova-funcionalidade`.
-5. Abra um Pull Request.
-
-### Licença
-
-Este projeto está licenciado sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
----
-
-Com essa descrição, seu repositório no GitHub terá uma apresentação clara e profissional, facilitando a compreensão do propósito do aplicativo e incentivando contribuições.
+```sh
+https://www.figma.com/design/vaK0eDh7IOXFmFOM8DizPj/Pedido-F%C3%A1cil?node-id=2-3&t=Z5QYkotzkCBOJh0Q-1
+```
+```sh
+https://www.figma.com/proto/vaK0eDh7IOXFmFOM8DizPj/Pedido-F%C3%A1cil?page-id=0%3A1&node-id=2-3&viewport=232%2C245%2C0.54&t=w7TcmXoiVZh2EeAc-1&scaling=scale-down&content-scaling=fixed&starting-point-node-id=2%3A3
+```
