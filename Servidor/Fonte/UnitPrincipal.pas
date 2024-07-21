@@ -24,21 +24,20 @@ var
 
 implementation
 
-{$R *.fmx}
-
 uses
-  Horse, Controller.Usuario;
+  Server.Horse;
+
+{$R *.fmx}
 
 procedure TfrmPrincipal.FormShow(Sender: TObject);
 begin
  {******************************************************
   Por enquantou vou deixar desta forma, porem mudarei esse Registrar Rotas
  *******************************************************}
-  Controller.Usuario.RegistrarRotas;
+  TServerHorse.RegisterRoutes;
+  TServerHorse.StartServer(9000);
 
-  THorse.Listen(9000);
-
-  mmo.Lines.Add('Servidor executando na porta: ' + THorse.Port.ToString);
+  mmo.Lines.Add('Servidor executando na porta: ' + TServerHorse.PortRunner);
 end;
 
 end.

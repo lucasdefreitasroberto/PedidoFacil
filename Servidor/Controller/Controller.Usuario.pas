@@ -3,30 +3,44 @@ unit Controller.Usuario;
 interface
 
 uses
-  Horse, Horse.Jhonson, Horse.CORS;
+  Horse, Horse.Jhonson, Horse.CORS, Services.Usuario, system.SysUtils;
 
 procedure RegistrarRotas;
 
-procedure InserirUsuarios(Req: THorseRequest; Res: THorseResponse);
-procedure Login(Req: THorseRequest; Res: THorseResponse);
-
 implementation
 
-procedure InserirUsuarios(Req: THorseRequest; Res: THorseResponse);
+procedure VrcInserirUsuarios(Req: THorseRequest; Res: THorseResponse);
 begin
-  Res.Send('{"mensagem":  "Usuario Cadastro..."}');
+  var
+  LService := TServicesUsuario.Create;
+  try
+    Res.Send(LService.InserirUsuarios);
+  finally
+    FreeAndNil(LService);
+  end;
 end;
 
-procedure Login(Req: THorseRequest; Res: THorseResponse);
+procedure VrcLogin(Req: THorseRequest; Res: THorseResponse);
 begin
-  Res.Send('{"erro":  "E-mail ou senha inválida..."}').Status(THTTPStatus.Unauthorized);
+  var
+  LService := TServicesUsuario.Create;
+  try
+    try
+      Res.Send(LService.Login).Status(THTTPStatus.OK);
+    except
+      on ex: Exception do
+        Res.Send(ex.Message).Status(500);
+    end;
+  finally
+    FreeAndNil(LService);
+  end;
 end;
 
 procedure RegistrarRotas;
 begin
   THorse
-    .Post('/usuarios', InserirUsuarios)
-    .Post('/usuarios/login', Login)
+  .Post('/usuarios', VrcInserirUsuarios)
+  .Post('/usuarios/login', VrcLogin)
 end;
-end.
 
+end.
