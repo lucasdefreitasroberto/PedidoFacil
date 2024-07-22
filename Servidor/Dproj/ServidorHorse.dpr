@@ -4,7 +4,7 @@ uses
   System.StartUpCopy,
   FMX.Forms,
   UnitPrincipal in '..\fonte\UnitPrincipal.pas' {frmPrincipal},
-  Controller.Usuario in '..\controller\Controller.Usuario.pas' {$R *.res},
+  Controller.Usuario in '..\controller\Controller.Usuario.pas' ,
   DM.Conexao in '..\DataModule\DM.Conexao.pas' {DMConexao: TDataModule},
   Utilitarios in '..\Utils\Utilitarios.pas',
   Services.Usuario in '..\Services\Services.Usuario.pas',

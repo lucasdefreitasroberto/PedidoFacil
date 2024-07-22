@@ -262,7 +262,9 @@
             <FormType>fmx</FormType>
         </DCCReference>
         <DCCReference Include="..\controller\Controller.Usuario.pas">
-            <Form>$R *.res</Form>
+            <Form>,
+  DM.Conexao in &apos;..\DataModule\DM.Conexao.pas&apos; {DMConexao</Form>
+            <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="..\DataModule\DM.Conexao.pas">
             <Form>DMConexao</Form>

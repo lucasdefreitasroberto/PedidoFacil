@@ -7,8 +7,8 @@ uses
   FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def,
   FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys, FireDAC.FMXUI.Wait,
   Data.DB, FireDAC.Comp.Client, FireDAC.Phys.FBDef, FireDAC.Phys.IBBase,
-  FireDAC.Phys.FB, System.IniFiles, Vcl.Dialogs, Vcl.Forms,
-  FireDAC.VCLUI.Wait, DataSet.Serialize.Config;
+  FireDAC.Phys.FB, System.IniFiles, Vcl.Dialogs, Vcl.Forms, FireDAC.VCLUI.Wait,
+  DataSet.Serialize.Config, FireDAC.DApt, system.JSON, DataSet.Serialize, Utilitarios;
 
 type
   TDMConexao = class(TDataModule)
@@ -93,6 +93,7 @@ begin
     with Connection.Params do   // Buscar dados do arquivo fisico...
     begin
       Clear;
+
       Add('DriverID=' + ini.ReadString('Banco de Dados', 'DriverID', ''));
       Add('Database=' + ini.ReadString('Banco de Dados', 'Database', ''));
       Add('User_Name=' + ini.ReadString('Banco de Dados', 'User_name', ''));

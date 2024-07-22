@@ -3,7 +3,7 @@ unit Controller.Usuario;
 interface
 
 uses
-  Horse, Horse.Jhonson, Horse.CORS, Services.Usuario, system.SysUtils;
+  Horse, Horse.Jhonson, Horse.CORS, Services.Usuario, system.SysUtils, system.JSON;
 
 procedure RegistrarRotas;
 
@@ -21,12 +21,28 @@ begin
 end;
 
 procedure VrcLogin(Req: THorseRequest; Res: THorseResponse);
+var
+  Email, Senha: string;
+  Body, JsonRetorno: TJSONObject;
 begin
+  Body := req.Body<TJSONObject>;
+  Email := Body.GetValue<string>('email', '');
+  Senha := Body.GetValue<string>('senha', '');
+
   var
   LService := TServicesUsuario.Create;
   try
     try
-      Res.Send(LService.Login).Status(THTTPStatus.OK);
+      JsonRetorno := LService.Login(email, senha);
+
+      if JsonRetorno.Size = 0 then
+        Res.Send('E-mail ou Senha inválida.').Status(THTTPStatus.Unauthorized)
+      else
+      begin
+        {'Ainda preciso gear o token para usuario'}
+        JsonRetorno.AddPair('token', '0000000000000000000000000');
+        Res.Send<TJSONObject>(JsonRetorno).Status(THTTPStatus.OK);
+      end;
     except
       on ex: Exception do
         Res.Send(ex.Message).Status(500);
