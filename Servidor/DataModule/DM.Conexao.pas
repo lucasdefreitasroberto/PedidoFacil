@@ -35,28 +35,37 @@ implementation
 
 {$R *.dfm}
 
+{$REGION ' Create '}
 constructor TDMConexao.Create;
 begin
   inherited Create(nil);
 end;
+{$ENDREGION}
 
+{$REGION ' DataModuleCreate '}
 procedure TDMConexao.DataModuleCreate(Sender: TObject);
 begin
   Self.ConfigDataSetSerialize();
   Self.ConnectToDatabase();
 end;
+{$ENDREGION}
 
+{$REGION ' conBeforeConnect '}
 procedure TDMConexao.conBeforeConnect(Sender: TObject);
 begin
    CarregarConfigDB(con);
 end;
+{$ENDREGION}
 
+{$REGION ' ConfigDataSetSerialize '}
 procedure TDMConexao.ConfigDataSetSerialize;
 begin
   TDataSetSerializeConfig.GetInstance.CaseNameDefinition := cndLower;
   TDataSetSerializeConfig.GetInstance.Import.DecimalSeparator := '.';
 end;
+{$ENDREGION}
 
+{$REGION ' ConnectToDatabase '}
 procedure TDMConexao.ConnectToDatabase;
 begin
   try
@@ -66,7 +75,9 @@ begin
       HandleConnectionError(E);
   end;
 end;
+{$ENDREGION}
 
+{$REGION ' HandleConnectionError '}
 procedure TDMConexao.HandleConnectionError(E: Exception);
 begin
   var
@@ -75,7 +86,9 @@ begin
   MessageDlg('Erro ao conectar com o banco de dados.' + sLineBreak + 'Motivo:' +
     sLineBreak + auxError, TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
 end;
+{$ENDREGION}
 
+{$REGION ' CarregarConfigDB '}
 procedure TDMConexao.CarregarConfigDB(Connection: TFDConnection);
 var
     ini : TIniFile;
@@ -117,5 +130,6 @@ begin
       ini.DisposeOf;
   end;
 end;
+{$ENDREGION}
 
 end.

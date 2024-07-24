@@ -29,16 +29,15 @@ uses
 
 {$R *.fmx}
 
+{$REGION ' FormShow '}
 procedure TfrmPrincipal.FormShow(Sender: TObject);
 begin
- {******************************************************
-  Por enquantou vou deixar desta forma, porem mudarei esse Registrar Rotas
- *******************************************************}
-  TServerHorse.RegisterRoutes;
   TServerHorse.StartServer(9000);
 
-  mmo.Lines.Add('Servidor executando na porta: ' + TServerHorse.PortRunner);
+  if TServerHorse.VerifyStartingHorse then
+    mmo.Lines.Add('Servidor executando na porta: ' + TServerHorse.PortRunner);
 end;
+{$ENDREGION}
 
 end.
 
