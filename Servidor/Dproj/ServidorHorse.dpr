@@ -10,7 +10,8 @@ uses
   Utilitarios in '..\Utils\Utilitarios.pas',
   Services.Usuario in '..\Services\Services.Usuario.pas',
   Server.Horse in '..\Fonte\Server.Horse.pas',
-  HashXMD5 in '..\Utils\HashXMD5.pas';
+  HashXMD5 in '..\Utils\HashXMD5.pas',
+  Controller.Auth in '..\Controller\Controller.Auth.pas';
 
 {$R *.res}
 

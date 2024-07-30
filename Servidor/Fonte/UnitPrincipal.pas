@@ -30,6 +30,7 @@ uses
 {$R *.fmx}
 
 {$REGION ' FormShow '}
+
 procedure TfrmPrincipal.FormShow(Sender: TObject);
 begin
   TServerHorse.StartServer(9000);
@@ -40,4 +41,3 @@ end;
 {$ENDREGION}
 
 end.
-

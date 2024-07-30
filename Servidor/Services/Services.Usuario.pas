@@ -9,8 +9,9 @@ uses
 type
   TServicesUsuario = class(TDMConexao)
   public
-    function Login(email, senha: string): TJSONObject;
+    function Login(Email, Senha: string): TJSONObject;
     function InserirUsuarios(const AUsuario: TJSONObject): TJSONObject;
+    function Push(CodUsuario: Integer; TokenPush: string): TJSONObject;
   end;
 
 implementation
@@ -55,7 +56,7 @@ begin
     Query.Free;
   end;
 
-{DESTA FORMA NÃO FICOU LEGAL}
+{***************************DESTA FORMA NÃO FICOU LEGAL********************}
 //  var
 //    Query := TQueryExecutor.Create(con);
 //  try
@@ -72,11 +73,12 @@ begin
 //  finally
 //    Query.Free;
 //  end;
+{****************************************************************************}
 end;
 {$ENDREGION}
 
 {$REGION ' Login '}
-function TServicesUsuario.Login(email, senha: string): TJSONObject;
+function TServicesUsuario.Login(Email, Senha: string): TJSONObject;
 begin
   var
     LSQL := ' select '+
@@ -84,8 +86,8 @@ begin
             ' USU.NOME, '+
             ' USU.EMAIL '+
             ' from USUARIO USU '+
-            ' where USU.EMAIL = '+QuotedStr(email)+' and '+
-            ' USU.SENHA = '+QuotedStr(SaltPassword(senha));
+            ' where USU.EMAIL = '+QuotedStr(Email)+' and '+
+            ' USU.SENHA = '+QuotedStr(SaltPassword(Senha));
   var
     Query := TQueryExecutor.Create(con);
   try
@@ -99,5 +101,35 @@ begin
   end;
 end;
 {$ENDREGION}
+
+function TServicesUsuario.Push(CodUsuario: Integer; TokenPush: string): TJSONObject;
+begin
+var
+    LSQL := ' update USUARIO USU ' +
+            ' set TOKEN_PUSH = :TOKEN_PUSH ' +
+            ' where (USU.COD_USUARIO = :COD_USUARIO) ' +
+            ' returning USU.COD_USUARIO ';
+
+
+  var
+    Query := TFDQuery.Create(nil);
+    Query.Connection := con;
+  try
+     with Query do
+     begin
+       Active := False;
+       SQL.Append(LSQL);
+
+       ParamByName('TOKEN_PUSH').Value := TokenPush;
+       ParamByName('COD_USUARIO').Value := CodUsuario;
+
+       Active := True;
+     end;
+
+     Result := Query.ToJSONObject;
+  finally
+    Query.Free;
+  end;
+end;
 
 end.
