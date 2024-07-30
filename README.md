@@ -12,6 +12,30 @@
 - **Operação Offline:** Continue a usar o aplicativo sem interrupções, mesmo sem acesso à internet. Todos os dados serão armazenados localmente e sincronizados posteriormente.
 - **Interface Intuitiva:** Design de interface de usuário simples e fácil de usar para garantir uma experiência fluida.
 
+### Rotas
+## **usuarios**
+
+![image](https://github.com/user-attachments/assets/af64ebd5-2dac-47cc-a948-8f836c145bcc)
+
+## **clientes**
+
+![image](https://github.com/user-attachments/assets/a44689de-2341-4731-88d4-c0625e08f01b)
+
+## **produtos**
+
+![image](https://github.com/user-attachments/assets/5e7c828d-30b6-4f21-9156-baa0304b5e26)
+
+## **pedidos**
+
+![image](https://github.com/user-attachments/assets/60fff954-a30b-458a-98b8-70daa624c60d)
+
+## **notificacoes**
+
+![image](https://github.com/user-attachments/assets/89417885-70d8-4d06-a2fb-133dfe54a315)
+
+## **cond-pagto**
+![image](https://github.com/user-attachments/assets/0f01206a-db88-4d80-8088-c55eb9984c91)
+
 ### Figma
 
 ```sh
