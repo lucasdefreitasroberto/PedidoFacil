@@ -9,9 +9,9 @@ uses
 type
   TServicesUsuario = class(TDMConexao)
   public
-    function Login(Email, Senha: string): TJSONObject;
-    function InserirUsuarios(const AUsuario: TJSONObject): TJSONObject;
-    function Push(CodUsuario: Integer; TokenPush: string): TJSONObject;
+    function SLogin(Email, Senha: string): TJSONObject;
+    function SInserirUsuarios(const AUsuario: TJSONObject): TJSONObject;
+    function SPush(CodUsuario: Integer; TokenPush: string): TJSONObject;
   end;
 
 implementation
@@ -19,7 +19,7 @@ implementation
 { TServicesUsuario }
 
 {$REGION ' InserirUsuarios '}
-function TServicesUsuario.InserirUsuarios(const AUsuario: TJSONObject): TJSONObject;
+function TServicesUsuario.SInserirUsuarios(const AUsuario: TJSONObject): TJSONObject;
 var
   LNome, LEmail, LSenha: string;
   Body: TJSONObject;
@@ -78,7 +78,7 @@ end;
 {$ENDREGION}
 
 {$REGION ' Login '}
-function TServicesUsuario.Login(Email, Senha: string): TJSONObject;
+function TServicesUsuario.SLogin(Email, Senha: string): TJSONObject;
 begin
   var
     LSQL := ' select '+
@@ -102,14 +102,15 @@ begin
 end;
 {$ENDREGION}
 
-function TServicesUsuario.Push(CodUsuario: Integer; TokenPush: string): TJSONObject;
+{$REGION ' Push '}
+
+function TServicesUsuario.SPush(CodUsuario: Integer; TokenPush: string): TJSONObject;
 begin
 var
     LSQL := ' update USUARIO USU ' +
             ' set TOKEN_PUSH = :TOKEN_PUSH ' +
             ' where (USU.COD_USUARIO = :COD_USUARIO) ' +
             ' returning USU.COD_USUARIO ';
-
 
   var
     Query := TFDQuery.Create(nil);
@@ -131,5 +132,5 @@ var
     Query.Free;
   end;
 end;
-
+{$ENDREGION}
 end.

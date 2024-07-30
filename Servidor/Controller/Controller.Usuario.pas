@@ -16,9 +16,9 @@ procedure RegistrarRotas;
 
 implementation
 
-{$REGION ' VerificaInserirUsuarios '}
+{$REGION ' CInserirUsuarios '}
 
-procedure VerificaInserirUsuarios(Req: THorseRequest; Res: THorseResponse);
+procedure CInserirUsuarios(Req: THorseRequest; Res: THorseResponse);
 var
   {LNome, LEmail, LSenha: string; 'ESTOU FAZENDO A ATRIBUIÇÃO AGORA DENTRO DO SERVICE'}
   LJsonRetorno: TJSONObject;
@@ -29,7 +29,7 @@ begin
   try
 
     try
-      LJsonRetorno := LService.InserirUsuarios(Req.Body<TJSONObject>);
+      LJsonRetorno := LService.SInserirUsuarios(Req.Body<TJSONObject>);
       LCodigoUser := LJsonRetorno.GetValue<Integer>('id', 0);
       LJsonRetorno.AddPair('token', Criar_Token(LCodigoUser)); {GERANDO TOKEN PELO ID}
       Res.Send<TJSONObject>(LJsonRetorno).Status(THTTPStatus.Created);
@@ -44,8 +44,8 @@ begin
 end;
 {$ENDREGION}
 
-{$REGION ' VerificaLogin '}
-procedure VerificaLogin(Req: THorseRequest; Res: THorseResponse);
+{$REGION ' CLogin '}
+procedure CLogin(Req: THorseRequest; Res: THorseResponse);
 var
   LEmail, LSenha: string;
   Body, LJsonRetorno: TJSONObject;
@@ -60,7 +60,7 @@ begin
   try
 
     try
-      LJsonRetorno := LService.Login(LEmail.ToLower, LSenha);
+      LJsonRetorno := LService.SLogin(LEmail.ToLower, LSenha);
 
       if LJsonRetorno.Size = 0 then
         Res.Send('E-mail ou Senha inválida.').Status(THTTPStatus.Unauthorized)
@@ -82,9 +82,9 @@ begin
 end;
 {$ENDREGION}
 
-{$REGION ' VerificaPush '}
+{$REGION ' CPush '}
 
-procedure VerificaPush(Req: THorseRequest; Res: THorseResponse);
+procedure CPush(Req: THorseRequest; Res: THorseResponse);
 var
   LEmail, LSenha: string;
   LTokenPush : string;
@@ -101,7 +101,7 @@ begin
       LCodigoUser := Get_Usuario_Request(Req);
       LTokenPush := LBody.GetValue<string>('token_push', '');
 
-      LJsonRetorno := LService.Push(LCodigoUser, LTokenPush);
+      LJsonRetorno := LService.SPush(LCodigoUser, LTokenPush);
       Res.Send<TJSONObject>(LJsonRetorno).Status(THTTPStatus.Created);
     except
       on ex: Exception do
@@ -114,15 +114,15 @@ begin
 end;
 {$ENDREGION}
 
-{$REGION ' RegistrarRotas '}
+{$REGION ' Registra Rotas '}
 procedure RegistrarRotas;
 begin
-  THorse.Post('/usuarios', VerificaInserirUsuarios);
-  THorse.Post('/usuarios/login', VerificaLogin);
+  THorse.Post('/usuarios', CInserirUsuarios);
+  THorse.Post('/usuarios/login', CLogin);
 
   THorse.AddCallback(HorseJWT(Controller.Auth.SECRET,
     THorseJWTConfig.New.SessionClass(TMyClaims))).Post('/usuarios/push',
-    VerificaPush)
+    CPush)
 end;
 {$ENDREGION}
 
