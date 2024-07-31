@@ -3,7 +3,7 @@ unit Server.Horse;
 interface
 
 uses
-  Horse, Horse.CORS, Horse.Jhonson, Controller.Usuario, System.SysUtils;
+  Horse, Horse.HandleException ,Horse.CORS, Horse.Jhonson, Controller.Usuario, System.SysUtils;
 
 type
   TServerHorse = class
@@ -24,6 +24,7 @@ begin
   THorse
   .Use(Jhonson())
   .Use(CORS)
+  .Use(HandleException);
 end;
 {$ENDREGION}
 

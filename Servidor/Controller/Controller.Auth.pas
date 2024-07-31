@@ -34,7 +34,7 @@ begin
 
     try
       LClaims.COD_USUARIO := Cod_Usuario;
-      LClaims.Expiration := IncHour(Now, 1);
+     // LClaims.Expiration := IncHour(Now, 1);  Removir o Token Expiration
       Result := TJOSE.SHA256CompactToken(SECRET, LJWT);
     except
       on E: Exception do
