@@ -56,24 +56,6 @@ begin
     Query.Free;
   end;
 
-{***************************DESTA FORMA NÃO FICOU LEGAL********************}
-//  var
-//    Query := TQueryExecutor.Create(con);
-//  try
-//    ResultSet := TDataSet.Create(nil);
-//    ResultSet := Query.ExecuteCommand(SQL, [Nome, Email, Senha], ['NOME', 'EMAIL', 'SENHA']);
-//    try
-//      Result := TJSONObject.Create;
-//      Result.AddPair('COD_USUARIO', TJSONNumber.Create(ResultSet.FieldByName('COD_USUARIO').AsInteger));
-//      Result.AddPair('NOME', ResultSet.FieldByName('NOME').AsString);
-//      Result.AddPair('EMAIL', ResultSet.FieldByName('EMAIL').AsString);
-//    finally
-//      ResultSet.Free;
-//    end;
-//  finally
-//    Query.Free;
-//  end;
-{****************************************************************************}
 end;
 {$ENDREGION}
 
@@ -106,7 +88,11 @@ end;
 
 function TServicesUsuario.SPush(CodUsuario: Integer; TokenPush: string): TJSONObject;
 begin
-var
+
+  if (TokenPush = '') then
+    raise Exception.Create('Informe o token push do usuário');
+
+  var
     LSQL := ' update USUARIO USU ' +
             ' set TOKEN_PUSH = :TOKEN_PUSH ' +
             ' where (USU.COD_USUARIO = :COD_USUARIO) ' +

@@ -18,7 +18,7 @@ implementation
 
 {$REGION ' CInserirUsuarios '}
 
-procedure CInserirUsuarios(Req: THorseRequest; Res: THorseResponse);
+procedure CInserirUsuarios(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 var
   {LNome, LEmail, LSenha: string; 'ESTOU FAZENDO A ATRIBUIÇÃO AGORA DENTRO DO SERVICE'}
   LJsonRetorno: TJSONObject;
@@ -30,8 +30,10 @@ begin
 
     try
       LJsonRetorno := LService.SInserirUsuarios(Req.Body<TJSONObject>);
-      LCodigoUser := LJsonRetorno.GetValue<Integer>('id', 0);
+      LCodigoUser := LJsonRetorno.GetValue<Integer>('cod_usuario', 0);
+
       LJsonRetorno.AddPair('token', Criar_Token(LCodigoUser)); {GERANDO TOKEN PELO ID}
+
       Res.Send<TJSONObject>(LJsonRetorno).Status(THTTPStatus.Created);
     except
       on ex: Exception do
@@ -45,7 +47,7 @@ end;
 {$ENDREGION}
 
 {$REGION ' CLogin '}
-procedure CLogin(Req: THorseRequest; Res: THorseResponse);
+procedure CLogin(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 var
   LEmail, LSenha: string;
   Body, LJsonRetorno: TJSONObject;
@@ -66,7 +68,7 @@ begin
         Res.Send('E-mail ou Senha inválida.').Status(THTTPStatus.Unauthorized)
       else
       begin
-        LCodigoUser := LJsonRetorno.GetValue<Integer>('id', 0);
+        LCodigoUser := LJsonRetorno.GetValue<Integer>('cod_usuario', 0);
 
         LJsonRetorno.AddPair('token', Criar_Token(LCodigoUser));
         Res.Send<TJSONObject>(LJsonRetorno).Status(THTTPStatus.Created);
@@ -84,21 +86,22 @@ end;
 
 {$REGION ' CPush '}
 
-procedure CPush(Req: THorseRequest; Res: THorseResponse);
+procedure CPush(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 var
   LEmail, LSenha: string;
   LTokenPush : string;
   LBody, LJsonRetorno: TJSONObject;
   LCodigoUser : Integer;
 begin
-  LBody := req.Body<TJSONObject>;
 
   var
   LService := TServicesUsuario.Create;
   try
 
     try
-      LCodigoUser := Get_Usuario_Request(Req);
+      LCodigoUser := Controller.Auth.Get_Usuario_Request(Req);
+
+      LBody := req.Body<TJSONObject>;
       LTokenPush := LBody.GetValue<string>('token_push', '');
 
       LJsonRetorno := LService.SPush(LCodigoUser, LTokenPush);
@@ -120,9 +123,10 @@ begin
   THorse.Post('/usuarios', CInserirUsuarios);
   THorse.Post('/usuarios/login', CLogin);
 
-  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET,
-    THorseJWTConfig.New.SessionClass(TMyClaims))).Post('/usuarios/push',
-    CPush)
+  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET, THorseJWTConfig.New.SessionClass(TMyClaims)))
+    .Post('/usuarios/push',
+    CPush);
+
 end;
 {$ENDREGION}
 

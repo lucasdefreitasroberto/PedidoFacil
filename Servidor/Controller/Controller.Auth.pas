@@ -4,7 +4,7 @@ interface
 
 uses
   Horse, Horse.JWT, JOSE.Core.JWT, JOSE.Core.Builder, JOSE.Types.JSON,
-  System.JSON, System.SysUtils;
+  System.JSON, System.SysUtils, System.DateUtils;
 
 const
   SECRET = '[SECRET-KEY]';
@@ -34,6 +34,7 @@ begin
 
     try
       LClaims.COD_USUARIO := Cod_Usuario;
+      LClaims.Expiration := IncHour(Now, 1);
       Result := TJOSE.SHA256CompactToken(SECRET, LJWT);
     except
       on E: Exception do
@@ -71,11 +72,12 @@ end;
 function TMyClaims.GetCodUsuario: Integer;
 begin
   Result := FJSON.GetValue<Integer>('id', 0);
+//   Result := TJSONUtils.GetJSONValueInt('id', FJSON).AsInteger;
 end;
 
 procedure TMyClaims.SetCodUsuario(const Value: Integer);
 begin
-   TJSONUtils.SetJSONValueFrom<Integer>('id', Value, FJSON);
+  TJSONUtils.SetJSONValueFrom<Integer>('id', Value, FJSON);
 end;
 
 end.
