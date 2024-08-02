@@ -101,10 +101,8 @@ end;
 {$ENDREGION}
 
 {$REGION ' Push '}
-
 function TServicesUsuario.SPush(CodUsuario: Integer; TokenPush: string): TJSONObject;
 begin
-
   if (TokenPush = '') then
     raise Exception.Create('Informe o token push do usuário');
 
@@ -134,11 +132,9 @@ begin
     Query.Free;
   end;
 end;
-
 {$ENDREGION}
 
 {$REGION ' EditarUsuario '}
-
 function TServicesUsuario.SEditarUsuario(CodUser : Integer; Nome, Email : string): TJSONObject;
 begin
 
@@ -169,12 +165,10 @@ begin
   finally
     Query.Free;
   end;
-
 end;
 {$ENDREGION}
 
 {$REGION ' EditarUsuario '}
-
 function TServicesUsuario.SEditarSenha(CodUser : Integer; Senha : string): TJSONObject;
 begin
 
@@ -208,18 +202,15 @@ end;
 {$ENDREGION}
 
 {$REGION ' VerifyEmailExistence '}
-
 function TServicesUsuario.VerifyEmailExistence(Email: string): Boolean;
 var
   LSQL: string;
   Query: TFDQuery;
 begin
   Result := False;
-
   LSQL := 'SELECT COUNT(*) AS EmailCount ' +
           'FROM USUARIO ' +
           'WHERE EMAIL = :EMAIL';
-
   Query := TFDQuery.Create(nil);
   Query.Connection := con;
   try
@@ -235,9 +226,7 @@ begin
   finally
     Query.Free;
   end;
-
 end;
-
 {$ENDREGION}
 
 end.

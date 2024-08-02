@@ -18,7 +18,6 @@ procedure RegistrarRotas;
 implementation
 
 {$REGION ' CInserirUsuarios '}
-
 procedure CInserirUsuario(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 var
   LJsonRetorno: TJSONObject;
@@ -87,7 +86,6 @@ end;
 {$ENDREGION}
 
 {$REGION ' CPush '}
-
 procedure CPush(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 var
   LEmail, LSenha: string;
@@ -121,7 +119,6 @@ end;
 {$ENDREGION}
 
 {$REGION ' CEditarUsuario '}
-
 procedure CEditarUsuario(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 var
   LJsonRetorno: TJSONObject;
@@ -154,7 +151,6 @@ end;
 {$ENDREGION}
 
 {$REGION ' CEditarSenha '}
-
 procedure CEditarSenha(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 var
   LJsonRetorno: TJSONObject;

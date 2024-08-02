@@ -23,6 +23,7 @@ function Get_Usuario_Request(Req: THorseRequest): Integer;
 
 implementation
 
+{$REGION ' Criar_Token '}
 function Criar_Token(Cod_Usuario: Integer): string;
 var
   LJWT: TJWT;
@@ -47,7 +48,9 @@ begin
     FreeAndNil(LJWT);
   end;
 end;
+{$ENDREGION}
 
+{$REGION ' Get_Usuario_Request '}
 function Get_Usuario_Request(Req: THorseRequest): Integer;
 var
   LClaims: TMyClaims;
@@ -66,19 +69,24 @@ begin
     end;
   end;
 end;
+{$ENDREGION}
 
 { TMyClaims }
 
+{$REGION ' GetCodUsuario '}
 function TMyClaims.GetCodUsuario: Integer;
 begin
   Result := FJSON.GetValue<Integer>('id', 0);
 //   Result := TJSONUtils.GetJSONValueInt('id', FJSON).AsInteger;
 end;
+{$ENDREGION}
 
+{$REGION ' SetCodUsuario '}
 procedure TMyClaims.SetCodUsuario(const Value: Integer);
 begin
   TJSONUtils.SetJSONValueFrom<Integer>('id', Value, FJSON);
 end;
+{$ENDREGION}
 
 end.
 

@@ -3,8 +3,12 @@ unit Utilitarios;
 interface
 
 uses
-  FireDAC.Comp.Client, System.Variants, Data.DB,
-  System.SysUtils, System.JSON, System.Classes,
+  FireDAC.Comp.Client,
+  System.Variants,
+  Data.DB,
+  System.SysUtils,
+  System.JSON,
+  System.Classes,
   DataSet.Serialize;
 
 type
