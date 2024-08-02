@@ -39,3 +39,6 @@ __recovery/
 
 # Boss dependency manager vendor folder https://github.com/HashLoad/boss
 modules/s
+
+#BANDO DE DADOS
+PEDIDOFACIL.FDB
