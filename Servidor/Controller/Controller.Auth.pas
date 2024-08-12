@@ -7,7 +7,7 @@ uses
   System.JSON, System.SysUtils, System.DateUtils;
 
 const
-  SECRET = '[SECRET-KEY]';
+  SECRET = '[LUCAS-SECRET-KEY]';
 
 type
   TMyClaims = class(TJWTClaims)

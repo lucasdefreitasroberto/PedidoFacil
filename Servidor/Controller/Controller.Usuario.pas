@@ -47,30 +47,21 @@ end;
 {$REGION ' CLogin '}
 procedure CLogin(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 var
-  LEmail, LSenha: string;
-  Body, LJsonRetorno: TJSONObject;
-  LCodigoUser : Integer;
+  LService: TServicesUsuario;
+  LJsonRetorno: TJSONObject;
+  LCodigoUser: Integer;
 begin
-  Body := Req.Body<TJSONObject>;
-  LEmail := Body.GetValue<string>('email', '');
-  LSenha := Body.GetValue<string>('senha', '');
-
-  if (LEmail = '') or (LSenha = '') then
-   raise EHorseException.New.Error('Informe o e-mail e a senha');
-
-  var
   LService := TServicesUsuario.Create;
   try
 
     try
-      LJsonRetorno := LService.SLogin(LEmail.ToLower, LSenha);
+      LJsonRetorno := LService.SLogin(Req.Body<TJSONObject>);
 
       if LJsonRetorno.Size = 0 then
         Res.Send('E-mail ou Senha inválida.').Status(THTTPStatus.Unauthorized)
       else
       begin
         LCodigoUser := LJsonRetorno.GetValue<Integer>('cod_usuario', 0);
-
         LJsonRetorno.AddPair('token', Criar_Token(LCodigoUser));
         Res.Send<TJSONObject>(LJsonRetorno).Status(THTTPStatus.Created);
       end;
@@ -88,24 +79,15 @@ end;
 {$REGION ' CPush '}
 procedure CPush(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 var
-  LEmail, LSenha: string;
-  LTokenPush : string;
-  LBody, LJsonRetorno: TJSONObject;
+  LService: TServicesUsuario;
+  LJsonRetorno: TJSONObject;
   LCodigoUser : Integer;
 begin
-  if (LTokenPush = '') then
-    raise Exception.Create('Informe o token_push do usuário');
-
-  var
   LService := TServicesUsuario.Create;
   try
 
     try
-      LCodigoUser := Controller.Auth.Get_Usuario_Request(Req);
-      LBody := Req.Body<TJSONObject>;
-      LTokenPush := LBody.GetValue<string>('token_push', '');
-
-      LJsonRetorno := LService.SPush(LCodigoUser, LTokenPush);
+      LJsonRetorno := LService.SPush(Req.Body<TJSONObject>, Req);
       Res.Send<TJSONObject>(LJsonRetorno).Status(THTTPStatus.OK);
     except
       on ex: Exception do
@@ -123,21 +105,13 @@ procedure CEditarUsuario(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 var
   LJsonRetorno: TJSONObject;
   LCodigoUser : Integer;
-  LEmail, LNome : string;
+  LService : TServicesUsuario;
 begin
-  LEmail := Req.Body<TJSONObject>.GetValue<string>('email', '');
-  LNome := Req.Body<TJSONObject>.GetValue<string>('nome', '');
-
-  if (LNome = '') or (LEmail = '') then
-    raise EHorseException.New.Error('Informe o nome e o e-mail do usuário');
-
-  var
   LService := TServicesUsuario.Create;
   try
 
     try
-      LCodigoUser := Controller.Auth.Get_Usuario_Request(Req);
-      LJsonRetorno := LService.SEditarUsuario(LCodigoUser, LNome, LEmail);
+      LJsonRetorno := LService.SEditarUsuario(Req.Body<TJSONObject>, Req);
       Res.Send<TJSONObject>(LJsonRetorno).Status(THTTPStatus.OK);
     except
       on ex: Exception do
@@ -154,21 +128,13 @@ end;
 procedure CEditarSenha(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 var
   LJsonRetorno: TJSONObject;
-  LCodigoUser : Integer;
-  LSenha : string;
+  LService : TServicesUsuario;
 begin
-  LSenha := Req.Body<TJSONObject>.GetValue<string>('senha', '');
-
-  if (LSenha = '') then
-    raise EHorseException.New.Error('Informe a senha do usuário');
-
-  var
   LService := TServicesUsuario.Create;
   try
 
     try
-      LCodigoUser := Controller.Auth.Get_Usuario_Request(Req);
-      LJsonRetorno := LService.SEditarSenha(LCodigoUser, LSenha);
+      LJsonRetorno := LService.SEditarSenha(Req.Body<TJSONObject>, Req);
       Res.Send<TJSONObject>(LJsonRetorno).Status(THTTPStatus.OK);
     except
       on ex: Exception do
