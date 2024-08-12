@@ -11,7 +11,9 @@ uses
   Services.Usuario in '..\Services\Services.Usuario.pas',
   Server.Horse in '..\Fonte\Server.Horse.pas',
   HashXMD5 in '..\Utils\HashXMD5.pas',
-  Controller.Auth in '..\Controller\Controller.Auth.pas';
+  Controller.Auth in '..\Controller\Controller.Auth.pas',
+  Interfaces.Conexao in '..\Utils\Interfaces.Conexao.pas',
+  Classe.Conexao in '..\Utils\Classe.Conexao.pas';
 
 {$R *.res}
 

@@ -12,7 +12,12 @@ uses
   FireDAC.Comp.Client,
   HashXMD5,
   Horse.Exception,
-  Horse.HandleException, Horse.Commons, Controller.Auth, Horse;
+  Horse.HandleException,
+  Horse.Commons,
+  Controller.Auth,
+  Horse,
+  Interfaces.Conexao,
+  Classe.Conexao;
 
 type
   TServicesUsuario = class(TDMConexao)
@@ -49,21 +54,17 @@ begin
             ' (:NOME, :EMAIL, :SENHA)'+
             ' returning COD_USUARIO, NOME, EMAIL';
   var
-    Query := TFDQuery.Create(nil);
-    Query.Connection := con;
+    FQuery := TQueryFD.Create;
   try
-     with Query do
-     begin
-       Active := False;
-       SQL.Append(LSQL);
-       ParamByName('NOME').Value := LNome;
-       ParamByName('EMAIL').Value := LEmail.ToLower;
-       ParamByName('SENHA').Value := SaltPassword(LSenha);
-       Active := True;
-     end;
-     Result := Query.ToJSONObject;
+    Result := FQuery
+               .SQL(LSQL)
+               .Params('NOME', LNome)
+               .Params('SENHA', LSenha)
+               .Params('EMAIL', LEmail)
+               .Open
+               .ToJSONObject;
   finally
-    Query.Free;
+    FQuery.Free;
   end;
 end;
 {$ENDREGION}
@@ -86,15 +87,14 @@ begin
             ' where USU.EMAIL = '+QuotedStr(LEmail.ToLower)+' and '+
             ' USU.SENHA = '+QuotedStr(SaltPassword(LSenha));
   var
-    Query := TQueryExecutor.Create(con);
+    FQuery := TQueryFD.Create;
   try
-    with Query.ExecuteReader(LSQL) do
-    begin
-      Result := ToJSONObject;
-    end;
-
+    Result := FQuery
+                .SQL(LSQL)
+                .Open
+                .ToJSONObject;
   finally
-    Query.Free;
+    FQuery.Free;
   end;
 end;
 {$ENDREGION}
@@ -115,23 +115,16 @@ begin
             ' returning USU.COD_USUARIO ';
 
   var
-  Query := TFDQuery.Create(nil);
-  Query.Connection := con;
+    FQuery := TQueryFD.Create;
   try
-     with Query do
-     begin
-       Active := False;
-       SQL.Append(LSQL);
-
-       ParamByName('TOKEN_PUSH').Value := LTokenPush;
-       ParamByName('COD_USUARIO').Value := LCodigoUsuario;
-
-       Active := True;
-     end;
-
-     Result := Query.ToJSONObject;
+    Result := FQuery
+                .SQL(LSQL)
+                .Params('TOKEN_PUSH', LTokenPush)
+                .Params('COD_USUARIO,', LCodigoUsuario)
+                .Open
+                .ToJSONObject;
   finally
-    Query.Free;
+    FQuery.Free;
   end;
 end;
 {$ENDREGION}
@@ -154,22 +147,17 @@ begin
             ' returning COD_USUARIO, NOME, EMAIL ';
 
   var
-    Query := TFDQuery.Create(nil);
-    Query.Connection := con;
+    FQuery := TQueryFD.Create;
   try
-     with Query do
-     begin
-       Active := False;
-       SQL.Append(LSQL);
-       ParamByName('NOME').Value := LNome;
-       ParamByName('EMAIL').Value := LEmail.ToLower;
-       ParamByName('COD_USUARIO').Value :=  LCodigoUsuario;
-       Active := True;
-     end;
-
-     Result := Query.ToJSONObject;
+    Result := FQuery
+                .SQL(LSQL)
+                .Params('NOME', LNome)
+                .Params('EMAIL', LEmail)
+                .Params('COD_USUARIO', LCodigoUsuario)
+                .Open
+                .ToJSONObject
   finally
-    Query.Free;
+    FQuery.Free;
   end;
 end;
 {$ENDREGION}
@@ -190,25 +178,17 @@ begin
             ' returning COD_USUARIO ';
 
   var
-    Query := TFDQuery.Create(nil);
-    Query.Connection := con;
+    FQuery := TQueryFD.Create;
   try
-     with Query do
-     begin
-       Active := False;
-       SQL.Append(LSQL);
-
-       ParamByName('SENHA').Value := SaltPassword(LSenha);
-       ParamByName('COD_USUARIO').Value := LCodigoUsuario;
-
-       Active := True;
-     end;
-
-     Result := Query.ToJSONObject;
+     Result := FQuery
+                .SQL(LSQL)
+                .Params('SENHA', SaltPassword(LSenha))
+                .Params('COD_USUARIO', LCodigoUsuario)
+                .Open
+                .ToJSONObject;
   finally
-    Query.Free;
+    FQuery.Free;
   end;
-
 end;
 {$ENDREGION}
 
