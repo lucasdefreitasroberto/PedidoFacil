@@ -21,13 +21,27 @@ uses
 
 type
   TServicesUsuario = class(TDMConexao)
+  private
+    const
+    EmptyFieldError: string = 'Informe o campo %s.';
+    function IsEmpty(Value: string): boolean;
+    procedure RaiseEmptyFieldError(FieldName: string);
+
+    procedure Verifica_Nome_Email_Senha_Vazia(Nome, Email, Senha: string);
+    procedure Verifica_Senha_Vazia(Senha: string);
+    procedure Verifica_Email_Senha_Vazia(Email, Senha: string);
+    procedure Verifica_TokenPush_Vazio(TokenPush: string);
+    procedure Verifica_Existencia_Email(Email: string);
+    procedure Verifica_Tamanho_Senha(Senha: string);
+    procedure Verifica_Nome_Email(Nome, Email: string);
+
   public
     function SLogin(const AUsuario: TJSONObject): TJSONObject;
     function SInserirUsuarios(const AUsuario: TJSONObject): TJSONObject;
     function SPush(const AUsuario: TJSONObject; Req: THorseRequest): TJSONObject;
     function SEditarUsuario(const AUsuario: TJSONObject; Req: THorseRequest): TJSONObject;
     function SEditarSenha(const AUsuario: TJSONObject; Req: THorseRequest): TJSONObject;
-    function VerifyEmailExistence(Email : string): Boolean;
+    function SObterDataHoraServidor: String;
   end;
 
 implementation
@@ -41,11 +55,9 @@ begin
   var LEmail := AUsuario.GetValue<string>('email', '');
   var LSenha := AUsuario.GetValue<string>('senha', '');
 
-  if (LNome = EmptyStr) or (LEmail.Trim = EmptyStr) or (LSenha = EmptyStr) then
-    raise EHorseException.New.Error('Informe o nome, e-mail e a senha');
-
-  if VerifyEmailExistence(LEmail.Trim) then
-    raise EHorseException.New.Error('Esse e-mail já está em uso por outra conta');
+  Self.Verifica_Nome_Email_Senha_Vazia(LNome, LEmail, LSenha);
+  Self.Verifica_Existencia_Email(LEmail);
+  Self.Verifica_Tamanho_Senha(LSenha);
 
   var
     LSQL := ' insert into USUARIO '+
@@ -75,8 +87,7 @@ begin
   var LEmail := AUsuario.GetValue<string>('email', '');
   var LSenha := AUsuario.GetValue<string>('senha', '');
 
-  if (LEmail.IsEmpty) or (LSenha.IsEmpty) then
-    raise EHorseException.New.Error('Informe o e-mail e a senha').Status(THTTPStatus.Unauthorized);
+  Self.Verifica_Email_Senha_Vazia(LEmail, LSenha);
 
   var
     LSQL := ' select '+
@@ -97,6 +108,7 @@ begin
     FQuery.Free;
   end;
 end;
+
 {$ENDREGION}
 
 {$REGION ' Push '}
@@ -105,8 +117,7 @@ begin
   var LTokenPush := AUsuario.GetValue<string>('token_push', '');
   var LCodigoUsuario := Controller.Auth.Get_Usuario_Request(Req);
 
-  if LTokenPush.IsEmpty then
-    raise EHorseException.New.Error('Informe o token push do usuário');
+  Self.Verifica_TokenPush_Vazio(LTokenPush);
 
   var
     LSQL := ' update USUARIO USU ' +
@@ -132,12 +143,12 @@ end;
 {$REGION ' EditarUsuario '}
 function TServicesUsuario.SEditarUsuario(const AUsuario: TJSONObject; Req: THorseRequest): TJSONObject;
 begin
-  var LEmail := AUsuario.GetValue<string>('email', '');
   var LNome := AUsuario.GetValue<string>('nome', '');
+  var LEmail := AUsuario.GetValue<string>('email', '');
   var LCodigoUsuario := Controller.Auth.Get_Usuario_Request(Req);
 
- if LNome.IsEmpty or LEmail.IsEmpty then
-    raise EHorseException.New.Error('Informe o nome e o e-mail do usuário');
+  Self.Verifica_Nome_Email(LNome, LEmail);
+  Self.Verifica_Existencia_Email(LEmail);
 
   var
     LSQL := ' update USUARIO '+
@@ -162,14 +173,14 @@ begin
 end;
 {$ENDREGION}
 
-{$REGION ' EditarUsuario '}
+{$REGION ' EditarSenha '}
 function TServicesUsuario.SEditarSenha(const AUsuario: TJSONObject; Req: THorseRequest): TJSONObject;
 begin
   var  LSenha := AUsuario.GetValue<string>('senha', '');
   var  LCodigoUsuario := Controller.Auth.Get_Usuario_Request(Req);
 
-  if (LSenha = '') then
-    raise EHorseException.New.Error('Informe a senha do usuário');
+  Self.Verifica_Senha_Vazia(LSenha);
+  Self.Verifica_Tamanho_Senha(LSenha);
 
   var
     LSQL := ' update USUARIO '+
@@ -192,8 +203,27 @@ begin
 end;
 {$ENDREGION}
 
-{$REGION ' VerifyEmailExistence '}
-function TServicesUsuario.VerifyEmailExistence(Email: string): Boolean;
+{$REGION ' SObterDataServidor '}
+function TServicesUsuario.SObterDataHoraServidor: String;
+begin
+  Result := FormatDateTime('yyyy-mm-dd hh:nn:ss', Now);
+end;
+{$ENDREGION}
+
+{$REGION ' Validacoes '}
+
+function TServicesUsuario.IsEmpty(Value: string): boolean;
+begin
+  Result := (Value.Trim = EmptyStr);
+end;
+
+procedure TServicesUsuario.RaiseEmptyFieldError(FieldName: string);
+begin
+  raise EHorseException.New.Error(Format(EmptyFieldError, [FieldName]))
+    .Status(THTTPStatus.BadRequest);
+end;
+
+procedure TServicesUsuario.Verifica_Existencia_Email(Email: string);
 begin
   var LSQL := 'SELECT COUNT(*) AS EmailCount ' +
               'FROM USUARIO ' +
@@ -203,13 +233,49 @@ begin
   try
     var LCount := Query.ExecuteScalar(LSQL);
 
-    if LCount > 0 then
-      Result := True;
+    if (LCount > 0) then
+     raise EHorseException.New.Error('Esse e-mail já está em uso por outra conta');
   finally
     Query.Free;
   end;
 end;
+
+procedure TServicesUsuario.Verifica_Email_Senha_Vazia(Email, Senha: string);
+begin
+  if IsEmpty(Email) or IsEmpty(Senha) then
+    RaiseEmptyFieldError('Email e/ou Senha');
+end;
+
+procedure TServicesUsuario.Verifica_Nome_Email(Nome, Email: string);
+begin
+  if IsEmpty(Nome) or IsEmpty(Email) then
+    RaiseEmptyFieldError('Nome e/ou Email');
+end;
+
+procedure TServicesUsuario.Verifica_Nome_Email_Senha_Vazia(Nome, Email, Senha: string);
+begin
+  if (Nome = EmptyStr) or (Email.Trim = EmptyStr) or (Senha = EmptyStr) then
+    raise EHorseException.New.Error('Informe o nome, e-mail e a senha');
+end;
+
+procedure TServicesUsuario.Verifica_Senha_Vazia(Senha: string);
+begin
+  if IsEmpty(Senha) then
+    RaiseEmptyFieldError('Senha');
+end;
+
+procedure TServicesUsuario.Verifica_Tamanho_Senha(Senha: string);
+begin
+  if Senha.Length < 5 then
+    raise EHorseException.New.Error('A senha deve ter no mínimo 5 caracteres').Status(THTTPStatus.BadRequest);
+end;
+
+procedure TServicesUsuario.Verifica_TokenPush_Vazio(TokenPush: string);
+begin
+  if IsEmpty(TokenPush) then
+    RaiseEmptyFieldError('Token Push');
+end;
+
 {$ENDREGION}
 
 end.
-

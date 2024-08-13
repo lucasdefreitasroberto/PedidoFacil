@@ -3,12 +3,32 @@ unit DM.Conexao;
 interface
 
 uses
-  System.SysUtils, System.Classes, FireDAC.Stan.Intf, FireDAC.Stan.Option,
-  FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def,
-  FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys, FireDAC.FMXUI.Wait,
-  Data.DB, FireDAC.Comp.Client, FireDAC.Phys.FBDef, FireDAC.Phys.IBBase,
-  FireDAC.Phys.FB, System.IniFiles, Vcl.Dialogs, Vcl.Forms, FireDAC.VCLUI.Wait,
-  DataSet.Serialize.Config, FireDAC.DApt, system.JSON, DataSet.Serialize, Utilitarios;
+  System.SysUtils,
+  System.Classes,
+  FireDAC.Stan.Intf,
+  FireDAC.Stan.Option,
+  FireDAC.Stan.Error,
+  FireDAC.UI.Intf,
+  FireDAC.Phys.Intf,
+  FireDAC.Stan.Def,
+  FireDAC.Stan.Pool,
+  FireDAC.Stan.Async,
+  FireDAC.Phys,
+  FireDAC.FMXUI.Wait,
+  Data.DB,
+  FireDAC.Comp.Client,
+  FireDAC.Phys.FBDef,
+  FireDAC.Phys.IBBase,
+  FireDAC.Phys.FB,
+  System.IniFiles,
+  Vcl.Dialogs,
+  Vcl.Forms,
+  FireDAC.VCLUI.Wait,
+  DataSet.Serialize.Config,
+  FireDAC.DApt,
+  system.JSON,
+  DataSet.Serialize,
+  Utilitarios;
 
 type
   TDMConexao = class(TDataModule)

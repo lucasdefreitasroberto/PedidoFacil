@@ -147,10 +147,32 @@ begin
 end;
 {$ENDREGION}
 
+{$REGION ' ObterDataHoraServidor '}
+procedure ObterDataHoraServidor(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+var
+  LService : TServicesUsuario;
+begin
+  LService := TServicesUsuario.Create;
+  try
+
+    try
+      Res.Send(LService.SObterDataHoraServidor).Status(THTTPStatus.OK);
+    except
+      on ex: Exception do
+        Res.Send(ex.Message).Status(500);
+    end;
+
+  finally
+    FreeAndNil(LService);
+  end;
+end;
+{$ENDREGION}
+
 {$REGION ' Registra Rotas '}
 procedure RegistrarRotas;
 begin
   THorse.Post('/usuarios', CInserirUsuario);
+
   THorse.Post('/usuarios/login', CLogin);
 
   THorse.AddCallback(HorseJWT(Controller.Auth.SECRET, THorseJWTConfig.New.SessionClass(TMyClaims)))
@@ -164,6 +186,10 @@ begin
   THorse.AddCallback(HorseJWT(Controller.Auth.SECRET, THorseJWTConfig.New.SessionClass(TMyClaims)))
   .Put('/usuarios/senha',
   CEditarSenha);
+
+  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET, THorseJWTConfig.New.SessionClass(TMyClaims)))
+  .Get('/usuarios/horario',
+  ObterDataHoraServidor);
 end;
 {$ENDREGION}
 

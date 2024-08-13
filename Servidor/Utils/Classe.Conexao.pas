@@ -3,8 +3,13 @@ unit Classe.Conexao;
 interface
 
 uses
-  Interfaces.Conexao, Data.DB, DM.Conexao, FireDAC.Comp.Client,
-  DataSet.Serialize, System.JSON, System.SysUtils;
+  Interfaces.Conexao,
+  Data.DB,
+  DM.Conexao,
+  FireDAC.Comp.Client,
+  DataSet.Serialize,
+  System.JSON,
+  System.SysUtils;
 
 type
   TQueryFD = class(TInterfacedObject, iQuery)

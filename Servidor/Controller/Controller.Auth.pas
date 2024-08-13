@@ -3,8 +3,14 @@ unit Controller.Auth;
 interface
 
 uses
-  Horse, Horse.JWT, JOSE.Core.JWT, JOSE.Core.Builder, JOSE.Types.JSON,
-  System.JSON, System.SysUtils, System.DateUtils;
+  Horse,
+  Horse.JWT,
+  JOSE.Core.JWT,
+  JOSE.Core.Builder,
+  JOSE.Types.JSON,
+  System.JSON,
+  System.SysUtils,
+  System.DateUtils;
 
 const
   SECRET = '[LUCAS-SECRET-KEY]';
