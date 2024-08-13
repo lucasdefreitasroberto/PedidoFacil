@@ -13,7 +13,9 @@ uses
   HashXMD5 in '..\Utils\HashXMD5.pas',
   Controller.Auth in '..\Controller\Controller.Auth.pas',
   Interfaces.Conexao in '..\Utils\Interfaces.Conexao.pas',
-  Classe.Conexao in '..\Utils\Classe.Conexao.pas';
+  Classe.Conexao in '..\Utils\Classe.Conexao.pas',
+  Controller.Notificacoes in '..\Controller\Controller.Notificacoes.pas',
+  Services.Notificacoes in '..\Services\Services.Notificacoes.pas';
 
 {$R *.res}
 

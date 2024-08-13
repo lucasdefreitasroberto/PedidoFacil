@@ -8,6 +8,7 @@ uses
   Horse.CORS,
   Horse.Jhonson,
   Controller.Usuario,
+  Controller.Notificacoes,
   System.SysUtils;
 
 type
@@ -37,6 +38,7 @@ end;
 class procedure TServerHorse.RegisterRoutes;
 begin
   Controller.Usuario.RegistrarRotas;
+  Controller.Notificacoes.RegistrarRotas;
 end;
 {$ENDREGION}
 

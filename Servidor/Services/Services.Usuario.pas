@@ -27,13 +27,13 @@ type
     function IsEmpty(Value: string): boolean;
     procedure RaiseEmptyFieldError(FieldName: string);
 
-    procedure Verifica_Nome_Email_Senha_Vazia(Nome, Email, Senha: string);
-    procedure Verifica_Senha_Vazia(Senha: string);
-    procedure Verifica_Email_Senha_Vazia(Email, Senha: string);
+    procedure Verifica_Nome_Email_Senha_Vazio(Nome, Email, Senha: string);
+    procedure Verifica_Senha_Vazio(Senha: string);
+    procedure Verifica_Email_Senha_Vazio(Email, Senha: string);
+    procedure Verifica_Nome_Email_Vazio(Nome, Email: string);
     procedure Verifica_TokenPush_Vazio(TokenPush: string);
     procedure Verifica_Existencia_Email(Email: string);
     procedure Verifica_Tamanho_Senha(Senha: string);
-    procedure Verifica_Nome_Email(Nome, Email: string);
 
   public
     function SLogin(const AUsuario: TJSONObject): TJSONObject;
@@ -55,7 +55,7 @@ begin
   var LEmail := AUsuario.GetValue<string>('email', '');
   var LSenha := AUsuario.GetValue<string>('senha', '');
 
-  Self.Verifica_Nome_Email_Senha_Vazia(LNome, LEmail, LSenha);
+  Self.Verifica_Nome_Email_Senha_Vazio(LNome, LEmail, LSenha);
   Self.Verifica_Existencia_Email(LEmail);
   Self.Verifica_Tamanho_Senha(LSenha);
 
@@ -87,7 +87,7 @@ begin
   var LEmail := AUsuario.GetValue<string>('email', '');
   var LSenha := AUsuario.GetValue<string>('senha', '');
 
-  Self.Verifica_Email_Senha_Vazia(LEmail, LSenha);
+  Self.Verifica_Email_Senha_Vazio(LEmail, LSenha);
 
   var
     LSQL := ' select '+
@@ -147,7 +147,7 @@ begin
   var LEmail := AUsuario.GetValue<string>('email', '');
   var LCodigoUsuario := Controller.Auth.Get_Usuario_Request(Req);
 
-  Self.Verifica_Nome_Email(LNome, LEmail);
+  Self.Verifica_Nome_Email_Vazio(LNome, LEmail);
   Self.Verifica_Existencia_Email(LEmail);
 
   var
@@ -179,7 +179,7 @@ begin
   var  LSenha := AUsuario.GetValue<string>('senha', '');
   var  LCodigoUsuario := Controller.Auth.Get_Usuario_Request(Req);
 
-  Self.Verifica_Senha_Vazia(LSenha);
+  Self.Verifica_Senha_Vazio(LSenha);
   Self.Verifica_Tamanho_Senha(LSenha);
 
   var
@@ -240,25 +240,25 @@ begin
   end;
 end;
 
-procedure TServicesUsuario.Verifica_Email_Senha_Vazia(Email, Senha: string);
+procedure TServicesUsuario.Verifica_Email_Senha_Vazio(Email, Senha: string);
 begin
   if IsEmpty(Email) or IsEmpty(Senha) then
     RaiseEmptyFieldError('Email e/ou Senha');
 end;
 
-procedure TServicesUsuario.Verifica_Nome_Email(Nome, Email: string);
+procedure TServicesUsuario.Verifica_Nome_Email_Vazio(Nome, Email: string);
 begin
   if IsEmpty(Nome) or IsEmpty(Email) then
     RaiseEmptyFieldError('Nome e/ou Email');
 end;
 
-procedure TServicesUsuario.Verifica_Nome_Email_Senha_Vazia(Nome, Email, Senha: string);
+procedure TServicesUsuario.Verifica_Nome_Email_Senha_Vazio(Nome, Email, Senha: string);
 begin
   if (Nome = EmptyStr) or (Email.Trim = EmptyStr) or (Senha = EmptyStr) then
     raise EHorseException.New.Error('Informe o nome, e-mail e a senha');
 end;
 
-procedure TServicesUsuario.Verifica_Senha_Vazia(Senha: string);
+procedure TServicesUsuario.Verifica_Senha_Vazio(Senha: string);
 begin
   if IsEmpty(Senha) then
     RaiseEmptyFieldError('Senha');

@@ -8,6 +8,7 @@ uses
 
 type
   iQuery = interface
+
     function StartTransaction: iQuery;
     function SQL(Value: string): iQuery;
     function Params(aParams: string; Value: Variant): iQuery; overload;
@@ -19,6 +20,7 @@ type
     function Commit: iQuery;
     function Rollback: iQuery;
     function ToJSONObject: TJSONObject; overload;
+    function ToJSONArray: TJSONArray; overload;
     procedure Free;
   end;
 

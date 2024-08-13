@@ -31,6 +31,7 @@ type
     function Commit: iQuery;
     function Rollback: iQuery;
     function ToJSONObject: TJSONObject; overload;
+    function ToJSONArray: TJSONArray; overload;
     procedure Free;
   end;
 
@@ -81,6 +82,11 @@ function TQueryFD.ExecSQL: iQuery;
 begin
   Result := Self;
   FDQuery.ExecSQL(True);
+end;
+
+function TQueryFD.ToJSONArray: TJSONArray;
+begin
+  Result := FDQuery.ToJSONArray;
 end;
 
 function TQueryFD.ToJSONObject: TJSONObject;
