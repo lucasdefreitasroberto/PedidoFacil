@@ -11,22 +11,25 @@ uses
   Controller.Auth,
   Horse.JWT,
   Horse.HandleException,
-  Services.Notificacoes, IdSSLOpenSSLHeaders;
+  Services.Notificacoes,
+  IdSSLOpenSSLHeaders;
 
 procedure RegistrarRotas;
 
 implementation
 
-procedure ListarNotificacoes(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+{$REGION ' CListarNotificacoes '}
+
+procedure CListarNotificacoes(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+var
+  LService : TServicesNotificacoes;
+  LJsonRetorno : TJSONArray;
 begin
-  var
   LService := TServicesNotificacoes.Create;
   try
 
     try
-      var
       LJsonRetorno := LService.SListarNotificacoes(Req.Body<TJSONObject>, Req);
-
       Res.Send<TJSONArray>(LJsonRetorno).Status(THTTPStatus.OK);
     except
       on ex: Exception do
@@ -38,12 +41,14 @@ begin
   end;
 end;
 
+{$ENDREGION}
+
 {$REGION ' Registra Rotas '}
 procedure RegistrarRotas;
 begin
   THorse.AddCallback(HorseJWT(Controller.Auth.SECRET, THorseJWTConfig.New.SessionClass(TMyClaims)))
   .Get('/notificacoes',
-  ListarNotificacoes);
+  CListarNotificacoes);
 end;
 {$ENDREGION}
 

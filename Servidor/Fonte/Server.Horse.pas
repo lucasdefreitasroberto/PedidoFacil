@@ -9,6 +9,7 @@ uses
   Horse.Jhonson,
   Controller.Usuario,
   Controller.Notificacoes,
+  Controller.Cliente,
   System.SysUtils;
 
 type
@@ -39,6 +40,7 @@ class procedure TServerHorse.RegisterRoutes;
 begin
   Controller.Usuario.RegistrarRotas;
   Controller.Notificacoes.RegistrarRotas;
+  Controller.Cliente.RegistrarRotas;
 end;
 {$ENDREGION}
 

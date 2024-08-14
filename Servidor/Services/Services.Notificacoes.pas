@@ -37,8 +37,8 @@ begin
              ' set IND_LIDO = ''S'' '+
              ' where COD_USUARIO = :COD_USUARIO '+
              ' and IND_LIDO = :IND_LIDO';
- var
-  FQuery := TQueryFD.Create;
+
+ var FQuery := TQueryFD.Create;
  try
    FQuery
     .SQL(LSQL)
@@ -66,22 +66,20 @@ begin
               ' from NOTIFICACAO'+
               ' where COD_USUARIO = :COD_USUARIO'+
               ' and IND_LIDO = :IND_LIDO ';
-              
   try
-    var 
-      FQuery := TQueryFD.Create;
+    var FQuery := TQueryFD.Create;
     try
        Result := FQuery
-                    .SQL(LSQL)
-                    .Params('COD_USUARIO', LCodigoUsuario)
-                    .Params('IND_LIDO', 'N')
-                    .Open
-                    .ToJSONArray;
+                   .SQL(LSQL)
+                   .Params('COD_USUARIO', LCodigoUsuario)
+                   .Params('IND_LIDO', 'N')
+                   .Open
+                   .ToJSONArray;
     finally
       FQuery.Free;
     end;
   finally
-    //Marcar Notificações como Lidas
+    //Se conseguir ler as notificações ela é marcarcada como lidas
     Self.MarcarNotificacoesLidas(LCodigoUsuario);
   end;
 

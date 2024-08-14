@@ -12,10 +12,13 @@ uses
   Server.Horse in '..\Fonte\Server.Horse.pas',
   HashXMD5 in '..\Utils\HashXMD5.pas',
   Controller.Auth in '..\Controller\Controller.Auth.pas',
-  Interfaces.Conexao in '..\Utils\Interfaces.Conexao.pas',
-  Classe.Conexao in '..\Utils\Classe.Conexao.pas',
   Controller.Notificacoes in '..\Controller\Controller.Notificacoes.pas',
-  Services.Notificacoes in '..\Services\Services.Notificacoes.pas';
+  Services.Notificacoes in '..\Services\Services.Notificacoes.pas',
+  Controller.Cliente in '..\Controller\Controller.Cliente.pas',
+  Services.Cliente in '..\Services\Services.Cliente.pas',
+  Classe.Conexao in '..\InfraConexao\Classe.Conexao.pas',
+  Interfaces.Conexao in '..\InfraConexao\Interfaces.Conexao.pas',
+  Validations.Usuario in '..\Validations\Validations.Usuario.pas';
 
 {$R *.res}
 

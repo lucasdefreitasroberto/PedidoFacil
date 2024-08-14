@@ -22,8 +22,8 @@ procedure CInserirUsuario(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 var
   LJsonRetorno: TJSONObject;
   LCodigoUser : Integer;
+  LService : TServicesUsuario;
 begin
-  var
   LService := TServicesUsuario.Create;
   try
 
@@ -55,7 +55,7 @@ begin
   try
 
     try
-      LJsonRetorno := LService.SLogin(Req.Body<TJSONObject>);
+      LJsonRetorno := LService.SLoginUsuario(Req.Body<TJSONObject>);
 
       if LJsonRetorno.Size = 0 then
         Res.Send('E-mail ou Senha inválida.').Status(THTTPStatus.Unauthorized)
@@ -134,7 +134,7 @@ begin
   try
 
     try
-      LJsonRetorno := LService.SEditarSenha(Req.Body<TJSONObject>, Req);
+      LJsonRetorno := LService.SEditarSenhaUsuario(Req.Body<TJSONObject>, Req);
       Res.Send<TJSONObject>(LJsonRetorno).Status(THTTPStatus.OK);
     except
       on ex: Exception do
