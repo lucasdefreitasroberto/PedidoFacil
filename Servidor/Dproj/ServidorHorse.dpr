@@ -18,7 +18,8 @@ uses
   Services.Cliente in '..\Services\Services.Cliente.pas',
   Classe.Conexao in '..\InfraConexao\Classe.Conexao.pas',
   Interfaces.Conexao in '..\InfraConexao\Interfaces.Conexao.pas',
-  Validations.Usuario in '..\Validations\Validations.Usuario.pas';
+  Validations.Usuario in '..\Validations\Validations.Usuario.pas',
+  Validations.Cliente in '..\Validations\Validations.Cliente.pas';
 
 {$R *.res}
 

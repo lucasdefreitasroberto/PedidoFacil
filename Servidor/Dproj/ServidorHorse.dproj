@@ -282,6 +282,7 @@
         <DCCReference Include="..\InfraConexao\Classe.Conexao.pas"/>
         <DCCReference Include="..\InfraConexao\Interfaces.Conexao.pas"/>
         <DCCReference Include="..\Validations\Validations.Usuario.pas"/>
+        <DCCReference Include="..\Validations\Validations.Cliente.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

@@ -17,17 +17,42 @@ uses
   Controller.Auth,
   Horse,
   Interfaces.Conexao,
-  Classe.Conexao;
+  Classe.Conexao,
+  Validations.Cliente;
+
+type
+  TClienteData = record
+    CodClienteLocal: Integer;
+    CNPJCPF: string;
+    Nome: string;
+    Fone: string;
+    Email: string;
+    Endereco: string;
+    Numero: string;
+    Complemento: string;
+    Bairro: string;
+    Cidade: string;
+    UF: string;
+    CEP: string;
+    Latitude: Double;
+    Longitude: Double;
+    LimiteDisponivel: Double;
+    DataUltAlteracao: string;
+    CodClienteOficial: Integer;
+  end;
 
 type
   TServicesCliente = class(TDMConexao)
   private
-    procedure VerificaDataUltimaSincronizacaoVazio(Data: string);
-    function SInserirCliente(const ACliente: TJSONObject;
-      Req: THorseRequest): TJSONObject;
+    function InsertSQLCliente: string;
+    function UpdateSQLCliente: string;
+    function ExtrairLClienteData(const ACliente: TJSONObject): TClienteData;
   public
     function SListarClientes(const ACliente:TJSONObject; Req: THorseRequest): TJSONArray;
+    function SInserirCliente(const ACliente: TJSONObject; Req: THorseRequest): TJSONObject;
   end;
+
+
 
 const
   QTD_REG_PAGINA_CLIENTE = 5; //Limite de Registro por Pagina
@@ -41,14 +66,11 @@ function TServicesCliente.SListarClientes(const ACliente: TJSONObject; Req: THor
 var
    LDtUltSincronizacao : string;
    LPagina : integer;
-begin
+begin                                                       {yyyy-mm-dd hh:nn:ss Retorno do Front-end;}
+  LDtUltSincronizacao := Req.Query['dt_ult_sincronizacao']; {url = clientes/sincronizacao?dt_ult_sincronizacao=2024-01-13 08:00:00}
 
-  try
-    LDtUltSincronizacao := Req.Query['dt_ult_sincronizacao'];       {yyyy-mm-dd hh:nn:ss Retorno do Front-end;}
-    Self.VerificaDataUltimaSincronizacaoVazio(LDtUltSincronizacao); {url = clientes/sincronizacao?dt_ult_sincronizacao=2024-01-13 08:00:00}
-  except
-    LDtUltSincronizacao := '';
-  end;
+  var LDtUltSincValidation := TDtUltSincVaziaValidation.Create(LDtUltSincronizacao);
+  LDtUltSincValidation.Validate;
 
   try
     LPagina := Req.Query['pagina'].ToInteger;{url = clientes/sincronizacao?dt_ult_sincronizacao=2024-01-13 08:00:00&pagina=1}
@@ -91,27 +113,122 @@ begin
                 .ToJSONArray;
   finally
     FQuery.Free;
+    LDtUltSincValidation.Free;
+  end;
+
+end;
+
+{$ENDREGION}
+
+{$REGION ' SInserirCliente '}
+function TServicesCliente.SInserirCliente(const ACliente: TJSONObject; Req: THorseRequest): TJSONObject;
+var
+  LSQL : string;
+  LClienteData : TClienteData;
+begin
+  var LCodigoUsuario := Controller.Auth.Get_Usuario_Request(Req);
+
+  LClienteData := Self.ExtrairLClienteData(ACliente);
+
+  var LNomeValidate := TNomeVazioValidation.Create(LClienteData.Nome);
+      LNomeValidate.Validate;
+
+  if LClienteData.CodClienteOficial = 0 then
+    LSQL := Self.InsertSQLCliente
+  else
+    LSQL := Self.UpdateSQLCliente;
+
+  var FQuery := TQueryFD.Create;
+  try
+    Result :=
+      FQuery
+        .SQL(LSQL)
+        .Params('COD_USUARIO', LCodigoUsuario)
+        .Params('COD_CLIENTE', LClienteData.CodClienteOficial)
+        .Params('CNPJ_CPF',    LClienteData.CNPJCPF)
+        .Params('NOME',        LClienteData.Nome)
+        .Params('FONE',        LClienteData.Fone)
+        .Params('EMAIL',       LClienteData.Email)
+        .Params('ENDERECO',    LClienteData.Endereco)
+        .Params('NUMERO',      LClienteData.Numero)
+        .Params('COMPLEMENTO', LClienteData.Complemento)
+        .Params('BAIRRO',      LClienteData.Bairro)
+        .Params('CIDADE',      LClienteData.Cidade)
+        .Params('UF',          LClienteData.UF)
+        .Params('CEP',         LClienteData.CEP)
+        .Params('LATITUDE',    LClienteData.Latitude)
+        .Params('LONGITUDE',   LClienteData.Longitude)
+        .Params('LIMITE_DISPONIVEL', LClienteData.LimiteDisponivel)
+        .Params('DATA_ULT_ALTERACAO',LClienteData.DataUltAlteracao)
+        .Open
+        .ToJSONObject
+        .AddPair('cod_cliente_local', TJSONNumber.Create(LClienteData.CodClienteLocal));   {"cod_cliente: 50, "cod_cliente_local": 123}
+  finally
+    FQuery.Free;
   end;
 
 end;
 {$ENDREGION}
 
-{$REGION ' SInserirCliente '}
-function TServicesCliente.SInserirCliente(const ACliente: TJSONObject; Req: THorseRequest): TJSONObject;
+{$REGION ' ExtrairLClienteData '}
+function TServicesCliente.ExtrairLClienteData(const ACliente: TJSONObject): TClienteData;
 begin
-
-
+  Result.CodClienteLocal    := ACliente.GetValue<Integer>('COD_CLIENTE_LOCAL', 0);
+  Result.CNPJCPF            := ACliente.GetValue<string>('CNPJ_CPF', '');
+  Result.Nome               := ACliente.GetValue<string>('NOME', '');
+  Result.Fone               := ACliente.GetValue<string>('FONE', '');
+  Result.Email              := ACliente.GetValue<string>('EMAIL', '');
+  Result.Endereco           := ACliente.GetValue<string>('ENDERECO', '');
+  Result.Numero             := ACliente.GetValue<string>('NUMERO', '');
+  Result.Complemento        := ACliente.GetValue<string>('COMPLEMENTO', '');
+  Result.Bairro             := ACliente.GetValue<string>('BAIRRO', '');
+  Result.Cidade             := ACliente.GetValue<string>('CIDADE', '');
+  Result.UF                 := ACliente.GetValue<string>('UF', '');
+  Result.CEP                := ACliente.GetValue<string>('CEP', '');
+  Result.Latitude           := ACliente.GetValue<Double>('LATITUDE', 0);
+  Result.Longitude          := ACliente.GetValue<Double>('LONGITUDE', 0);
+  Result.LimiteDisponivel   := ACliente.GetValue<Double>('LIMITE_DISPONIVEL', 0);
+  Result.DataUltAlteracao   := ACliente.GetValue<string>('DATA_ULT_ALTERACAO', '');
+  Result.CodClienteOficial  := ACliente.GetValue<Integer>('COD_CLIENTE_OFICIAL', 0);
 end;
 {$ENDREGION}
 
-
-{$REGION ' Validações '}
-procedure TServicesCliente.VerificaDataUltimaSincronizacaoVazio(Data: string);
+{$REGION ' InsertSQLCliente '}
+function TServicesCliente.InsertSQLCliente: string;
 begin
-  if Data = EmptyStr then
-    raise EHorseException.New.Error('Parâmetro dt_ult_sincronizacao não informado')
+  Result :=
+      ' insert into CLIENTE (COD_CLIENTE, COD_USUARIO, CNPJ_CPF, NOME, FONE, EMAIL, ENDERECO, NUMERO, COMPLEMENTO, BAIRRO, ' +
+      ' CIDADE, UF, CEP, LATITUDE, LONGITUDE, LIMITE_DISPONIVEL, DATA_ULT_ALTERACAO) ' +
+      ' values (:COD_CLIENTE, :COD_USUARIO, :CNPJ_CPF, :NOME, :FONE, :EMAIL, :ENDERECO, :NUMERO, :COMPLEMENTO, :BAIRRO, :CIDADE, ' +
+      ' :UF, :CEP, :LATITUDE, :LONGITUDE, :LIMITE_DISPONIVEL, :DATA_ULT_ALTERACAO) '+
+      ' returning COD_CLIENTE';
 end;
+{$ENDREGION}
 
+{$REGION ' UpdateSQLCliente '}
+function TServicesCliente.UpdateSQLCliente: string;
+begin
+  Result :=
+        ' update CLIENTE '+
+        ' set COD_USUARIO = :COD_USUARIO, '+
+        ' CNPJ_CPF = :CNPJ_CPF, '+
+        ' NOME = :NOME, '+
+        ' FONE = :FONE, '+
+        ' EMAIL = :EMAIL, '+
+        ' ENDERECO = :ENDERECO, '+
+        ' NUMERO = :NUMERO, '+
+        ' COMPLEMENTO = :COMPLEMENTO, '+
+        ' BAIRRO = :BAIRRO, '+
+        ' CIDADE = :CIDADE, '+
+        ' UF = :UF, '+
+        ' CEP = :CEP, '+
+        ' LATITUDE = :LATITUDE, '+
+        ' LONGITUDE = :LONGITUDE, '+
+        ' LIMITE_DISPONIVEL = :LIMITE_DISPONIVEL, '+
+        ' DATA_ULT_ALTERACAO = :DATA_ULT_ALTERACAO '+
+        ' where (COD_CLIENTE = :COD_CLIENTE) '+
+        ' returning COD_CLIENTE ';
+end;
 {$ENDREGION}
 
 end.

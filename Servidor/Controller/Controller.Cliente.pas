@@ -43,7 +43,6 @@ end;
 {$ENDREGION}
 
 {$REGION ' CInserirCliente '}
-
 procedure CInserirCliente(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 var
   LService : TServicesCliente;
@@ -74,7 +73,7 @@ begin
   CListarClientes);
 
   THorse.AddCallback(HorseJWT(Controller.Auth.SECRET, THorseJWTConfig.New.SessionClass(TMyClaims)))
-  .Get('/clientes/sincronizacao',
+  .Post('/clientes/sincronizacao',
   CInserirCliente);
 end;
 {$ENDREGION}
