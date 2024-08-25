@@ -19,12 +19,17 @@ uses
   Classe.Conexao in '..\InfraConexao\Classe.Conexao.pas',
   Interfaces.Conexao in '..\InfraConexao\Interfaces.Conexao.pas',
   Validations.Usuario in '..\Validations\Validations.Usuario.pas',
-  Validations.Cliente in '..\Validations\Validations.Cliente.pas';
+  Validations.Cliente in '..\Validations\Validations.Cliente.pas',
+  Controller.Produto in '..\Controller\Controller.Produto.pas',
+  Services.Produto in '..\Services\Services.Produto.pas',
+  Validations.Produto in '..\Validations\Validations.Produto.pas',
+  Validations in '..\Validations\Validations.pas';
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.CreateForm(TfrmPrincipal, frmPrincipal);
+  ReportMemoryLeaksOnShutdown := True;
   Application.Run;
 end.

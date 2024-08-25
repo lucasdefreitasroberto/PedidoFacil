@@ -7,18 +7,12 @@ uses
   Horse.Exception,
   Classe.Conexao,
   Utilitarios,
-  DM.Conexao, FireDAC.Comp.Client, Horse.Commons;
+  DM.Conexao,
+  FireDAC.Comp.Client,
+  Horse.Commons,
+  Validations;
 
 type
-  IValidation = interface
-    ['{4C6E3F8E-BCEA-4B9F-ABCF-921F23EB1D5F}']
-    procedure Validate;
-  end;
-
-  TBaseValidation = class abstract(TInterfacedObject, IValidation)
-  public
-    procedure Validate; virtual; abstract;
-  end;
 
   TNomeEmailSenhaVaziaValidation = class(TBaseValidation)
   private

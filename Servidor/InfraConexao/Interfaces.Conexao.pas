@@ -4,7 +4,8 @@ interface
 
 uses
   Data.DB,
-  System.JSON;
+  System.JSON,
+  System.Classes;
 
 type
   iQuery = interface
@@ -19,8 +20,9 @@ type
     function DataSet: TDataSet; overload;
     function Commit: iQuery;
     function Rollback: iQuery;
-    function ToJSONObject: TJSONObject; overload;
-    function ToJSONArray: TJSONArray; overload;
+    function ToJSONObject: TJSONObject;
+    function ToJSONArray: TJSONArray;
+    function ToBlobStream(AValue: string): TStream;
     procedure Free;
   end;
 

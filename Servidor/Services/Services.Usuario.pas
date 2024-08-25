@@ -39,18 +39,23 @@ implementation
 {$REGION ' InserirUsuarios '}
 function TServicesUsuario.SInserirUsuarios(const AUsuario: TJSONObject): TJSONObject;
 begin
-  var LNome :=  AUsuario.GetValue<string>('nome', '');
+  var LNome  := AUsuario.GetValue<string>('nome', '');
   var LEmail := AUsuario.GetValue<string>('email', '');
   var LSenha := AUsuario.GetValue<string>('senha', '');
 
   var LNomeEmailSenhaVaziaValidation := TNomeEmailSenhaVaziaValidation.Create(LNome, LEmail, LSenha);
-      LNomeEmailSenhaVaziaValidation.Validate;
+  var LEmailExistenteValidation      := TEmailExistenteValidation.Create(LEmail, Self.con);
+  var LSenhaTamanhoValidation        := TSenhaTamanhoValidation.Create(LSenha);
 
-  var LEmailExistenteValidation := TEmailExistenteValidation.Create(LEmail, Self.con);
-      LEmailExistenteValidation.Validate;
-
-  var LSenhaTamanhoValidation := TSenhaTamanhoValidation.Create(LSenha);
-      LSenhaTamanhoValidation.Validate;
+  try
+    LNomeEmailSenhaVaziaValidation.Validate;
+    LEmailExistenteValidation.Validate;
+    LSenhaTamanhoValidation.Validate;
+  finally
+    LNomeEmailSenhaVaziaValidation.Free;
+    LEmailExistenteValidation.Free;
+    LSenhaTamanhoValidation.Free;
+  end;
 
   var LSQL := ' insert into USUARIO '+
               ' (NOME, EMAIL, SENHA)'+
@@ -69,9 +74,6 @@ begin
                .ToJSONObject;
   finally
     FQuery.Free;
-    LNomeEmailSenhaVaziaValidation.Free;
-    LEmailExistenteValidation.Free;
-    LSenhaTamanhoValidation.Free;
   end;
 end;
 {$ENDREGION}
@@ -83,7 +85,12 @@ begin
   var LSenha := AUsuario.GetValue<string>('senha', '');
 
   var LEmailSenhaVaziaValidation := TEmailSenhaVaziaValidation.Create(LEmail, LSenha);
-      LEmailSenhaVaziaValidation.Validate;
+
+  try
+    LEmailSenhaVaziaValidation.Validate;
+  finally
+    LEmailSenhaVaziaValidation.Free;
+  end;
 
   var LSQL := ' select '+
               ' USU.COD_USUARIO, '+
@@ -101,7 +108,6 @@ begin
                 .ToJSONObject;
   finally
     FQuery.Free;
-    LEmailSenhaVaziaValidation.Free;
   end;
 end;
 
@@ -110,11 +116,16 @@ end;
 {$REGION ' Push '}
 function TServicesUsuario.SPush(const AUsuario: TJSONObject; Req: THorseRequest): TJSONObject;
 begin
-  var LTokenPush := AUsuario.GetValue<string>('token_push', '');
+  var LTokenPush     := AUsuario.GetValue<string>('token_push', '');
   var LCodigoUsuario := Controller.Auth.Get_Usuario_Request(Req);
 
   var LTokenPushVazioValidation := TTokenPushVazioValidation.Create(LTokenPush);
-      LTokenPushVazioValidation.Validate;
+
+  try
+    LTokenPushVazioValidation.Validate;
+  finally
+    LTokenPushVazioValidation.Free;
+  end;
 
   var LSQL := ' update USUARIO ' +
               ' set TOKEN_PUSH = :TOKEN_PUSH ' +
@@ -131,7 +142,6 @@ begin
                 .ToJSONObject;
   finally
     FQuery.Free;
-    LTokenPushVazioValidation.Free;
   end;
 end;
 {$ENDREGION}
@@ -140,14 +150,19 @@ end;
 function TServicesUsuario.SEditarUsuario(const AUsuario: TJSONObject; Req: THorseRequest): TJSONObject;
 begin
   var LCodigoUsuario := Controller.Auth.Get_Usuario_Request(Req);
-  var LNome := AUsuario.GetValue<string>('nome', '');
+  var LNome  := AUsuario.GetValue<string>('nome', '');
   var LEmail := AUsuario.GetValue<string>('email', '');
 
   var LNomeEmailVaziaValidation := TNomeEmailVaziaValidation.Create(LNome, LEmail);
-      LNomeEmailVaziaValidation.Validate;
-
   var LEmailExistenteValidation := TEmailExistenteValidation.Create(LEmail, Self.con);
-      LEmailExistenteValidation.Validate;
+
+  try
+    LNomeEmailVaziaValidation.Validate;
+    LEmailExistenteValidation.Validate;
+  finally
+    LNomeEmailVaziaValidation.Free;
+    LEmailExistenteValidation.Free;
+  end;
 
   var
     LSQL := ' update USUARIO '+
@@ -167,8 +182,6 @@ begin
                 .ToJSONObject
   finally
     FQuery.Free;
-    LNomeEmailVaziaValidation.Free;
-    LEmailExistenteValidation.Free;
   end;
 end;
 {$ENDREGION}
@@ -179,11 +192,16 @@ begin
   var LSenha := AUsuario.GetValue<string>('senha', '');
   var LCodigoUsuario := Controller.Auth.Get_Usuario_Request(Req);
 
-  var LSenhaVaziaValidation := TSenhaVaziaValidation.Create(LSenha);
-      LSenhaVaziaValidation.Validate;
-
+  var LSenhaVaziaValidation   := TSenhaVaziaValidation.Create(LSenha);
   var LSenhaTamanhoValidation := TSenhaTamanhoValidation.Create(LSenha);
-      LSenhaTamanhoValidation.Validate;
+
+  try
+    LSenhaVaziaValidation.Validate;
+    LSenhaTamanhoValidation.Validate;
+  finally
+    LSenhaVaziaValidation.Free;
+    LSenhaTamanhoValidation.Free;
+  end;
 
   var LSQL := ' update USUARIO '+
               ' set SENHA = :SENHA '+
@@ -200,8 +218,6 @@ begin
                 .ToJSONObject;
   finally
     FQuery.Free;
-    LSenhaVaziaValidation.Free;
-    LSenhaTamanhoValidation.Free;
   end;
 end;
 {$ENDREGION}

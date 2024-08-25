@@ -37,7 +37,7 @@ type
     Latitude: Double;
     Longitude: Double;
     LimiteDisponivel: Double;
-    DataUltAlteracao: string;
+    DataUltAlteracao: TDateTime;
     CodClienteOficial: Integer;
   end;
 
@@ -46,7 +46,8 @@ type
   private
     function InsertSQLCliente: string;
     function UpdateSQLCliente: string;
-    function ExtrairLClienteData(const ACliente: TJSONObject): TClienteData;
+    function ListarCliente: string;
+    function ExtrairClienteData(const ACliente: TJSONObject): TClienteData;
   public
     function SListarClientes(const ACliente:TJSONObject; Req: THorseRequest): TJSONArray;
     function SInserirCliente(const ACliente: TJSONObject; Req: THorseRequest): TJSONObject;
@@ -70,7 +71,11 @@ begin                                                       {yyyy-mm-dd hh:nn:ss
   LDtUltSincronizacao := Req.Query['dt_ult_sincronizacao']; {url = clientes/sincronizacao?dt_ult_sincronizacao=2024-01-13 08:00:00}
 
   var LDtUltSincValidation := TDtUltSincVaziaValidation.Create(LDtUltSincronizacao);
-  LDtUltSincValidation.Validate;
+  try
+    LDtUltSincValidation.Validate;
+  finally
+    LDtUltSincValidation.Free;
+  end;
 
   try
     LPagina := Req.Query['pagina'].ToInteger;{url = clientes/sincronizacao?dt_ult_sincronizacao=2024-01-13 08:00:00&pagina=1}
@@ -80,27 +85,7 @@ begin                                                       {yyyy-mm-dd hh:nn:ss
 
   var LSkip := (LPagina * QTD_REG_PAGINA_CLIENTE) - QTD_REG_PAGINA_CLIENTE;  //Pular Registros
 
-  var LSQL := ' select first :FIRST skip :SKIP'+
-              ' COD_CLIENTE,'+
-              ' COD_USUARIO,'+
-              ' CNPJ_CPF,'+
-              ' NOME,'+
-              ' FONE,'+
-              ' EMAIL,'+
-              ' ENDERECO,'+
-              ' NUMERO,'+
-              ' COMPLEMENTO,'+
-              ' BAIRRO,'+
-              ' CIDADE,'+
-              ' UF,'+
-              ' CEP,'+
-              ' LATITUDE,'+
-              ' LONGITUDE,'+
-              ' LIMITE_DISPONIVEL,'+
-              ' DATA_ULT_ALTERACAO'+
-              ' from CLIENTE'+              
-              ' where DATA_ULT_ALTERACAO > :DATA_ULT_ALTERACAO'+
-              ' order by COD_CLIENTE';
+  var LSQL := Self.ListarCliente;
 
   var FQuery := TQueryFD.Create;
   try
@@ -113,7 +98,6 @@ begin                                                       {yyyy-mm-dd hh:nn:ss
                 .ToJSONArray;
   finally
     FQuery.Free;
-    LDtUltSincValidation.Free;
   end;
 
 end;
@@ -124,14 +108,17 @@ end;
 function TServicesCliente.SInserirCliente(const ACliente: TJSONObject; Req: THorseRequest): TJSONObject;
 var
   LSQL : string;
-  LClienteData : TClienteData;
+  resultado :TJSONObject;
 begin
   var LCodigoUsuario := Controller.Auth.Get_Usuario_Request(Req);
+  var LClienteData   := Self.ExtrairClienteData(ACliente);
+  var LNomeValidate  := TNomeVazioValidation.Create(LClienteData.Nome);
 
-  LClienteData := Self.ExtrairLClienteData(ACliente);
-
-  var LNomeValidate := TNomeVazioValidation.Create(LClienteData.Nome);
-      LNomeValidate.Validate;
+  try
+    LNomeValidate.Validate;
+  finally
+    LNomeValidate.Free;
+  end;
 
   if LClienteData.CodClienteOficial = 0 then
     LSQL := Self.InsertSQLCliente
@@ -158,11 +145,11 @@ begin
         .Params('CEP',         LClienteData.CEP)
         .Params('LATITUDE',    LClienteData.Latitude)
         .Params('LONGITUDE',   LClienteData.Longitude)
-        .Params('LIMITE_DISPONIVEL', LClienteData.LimiteDisponivel)
-        .Params('DATA_ULT_ALTERACAO',LClienteData.DataUltAlteracao)
+        .Params('LIMITE_DISPONIVEL',  LClienteData.LimiteDisponivel)
+        .Params('DATA_ULT_ALTERACAO', LClienteData.DataUltAlteracao)
         .Open
         .ToJSONObject
-        .AddPair('cod_cliente_local', TJSONNumber.Create(LClienteData.CodClienteLocal));   {"cod_cliente: 50, "cod_cliente_local": 123}
+        .AddPair('cod_cliente_local', TJSONNumber.Create(LClienteData.CodClienteLocal)); {"cod_cliente: 50, "cod_cliente_local": 123}
   finally
     FQuery.Free;
   end;
@@ -170,8 +157,8 @@ begin
 end;
 {$ENDREGION}
 
-{$REGION ' ExtrairLClienteData '}
-function TServicesCliente.ExtrairLClienteData(const ACliente: TJSONObject): TClienteData;
+{$REGION ' ExtrairClienteData '}
+function TServicesCliente.ExtrairClienteData(const ACliente: TJSONObject): TClienteData;
 begin
   Result.CodClienteLocal    := ACliente.GetValue<Integer>('COD_CLIENTE_LOCAL', 0);
   Result.CNPJCPF            := ACliente.GetValue<string>('CNPJ_CPF', '');
@@ -188,8 +175,35 @@ begin
   Result.Latitude           := ACliente.GetValue<Double>('LATITUDE', 0);
   Result.Longitude          := ACliente.GetValue<Double>('LONGITUDE', 0);
   Result.LimiteDisponivel   := ACliente.GetValue<Double>('LIMITE_DISPONIVEL', 0);
-  Result.DataUltAlteracao   := ACliente.GetValue<string>('DATA_ULT_ALTERACAO', '');
+  Result.DataUltAlteracao   := Now;
   Result.CodClienteOficial  := ACliente.GetValue<Integer>('COD_CLIENTE_OFICIAL', 0);
+end;
+{$ENDREGION}
+
+{$REGION ' ListarCliente '}
+function TServicesCliente.ListarCliente: string;
+begin
+  Result :=   ' select first :FIRST skip :SKIP'+
+              ' COD_CLIENTE,'+
+              ' COD_USUARIO,'+
+              ' CNPJ_CPF,'+
+              ' NOME,'+
+              ' FONE,'+
+              ' EMAIL,'+
+              ' ENDERECO,'+
+              ' NUMERO,'+
+              ' COMPLEMENTO,'+
+              ' BAIRRO,'+
+              ' CIDADE,'+
+              ' UF,'+
+              ' CEP,'+
+              ' LATITUDE,'+
+              ' LONGITUDE,'+
+              ' LIMITE_DISPONIVEL,'+
+              ' DATA_ULT_ALTERACAO'+
+              ' from CLIENTE'+
+              ' where DATA_ULT_ALTERACAO > :DATA_ULT_ALTERACAO'+
+              ' order by COD_CLIENTE';
 end;
 {$ENDREGION}
 

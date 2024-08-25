@@ -9,7 +9,10 @@ uses
   FireDAC.Comp.Client,
   DataSet.Serialize,
   System.JSON,
-  System.SysUtils;
+  System.SysUtils,
+  Horse.Exception,
+  System.Classes,
+  Horse.OctetStream;
 
 type
   TQueryFD = class(TInterfacedObject, iQuery)
@@ -30,8 +33,9 @@ type
     function DataSet: TDataSet; overload;
     function Commit: iQuery;
     function Rollback: iQuery;
-    function ToJSONObject: TJSONObject; overload;
-    function ToJSONArray: TJSONArray; overload;
+    function ToJSONObject: TJSONObject;
+    function ToJSONArray: TJSONArray;
+    function ToBlobStream(AValue: string): TStream;
     procedure Free;
   end;
 
@@ -82,6 +86,11 @@ function TQueryFD.ExecSQL: iQuery;
 begin
   Result := Self;
   FDQuery.ExecSQL(True);
+end;
+
+function TQueryFD.ToBlobStream(AValue: string): TStream;
+begin
+  Result := FDQuery.CreateBlobStream(FDQuery.FieldByName(AValue), TBlobStreamMode.bmRead);
 end;
 
 function TQueryFD.ToJSONArray: TJSONArray;

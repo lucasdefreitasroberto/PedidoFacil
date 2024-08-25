@@ -81,7 +81,6 @@ procedure CPush(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 var
   LService: TServicesUsuario;
   LJsonRetorno: TJSONObject;
-  LCodigoUser : Integer;
 begin
   LService := TServicesUsuario.Create;
   try
@@ -104,7 +103,6 @@ end;
 procedure CEditarUsuario(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 var
   LJsonRetorno: TJSONObject;
-  LCodigoUser : Integer;
   LService : TServicesUsuario;
 begin
   LService := TServicesUsuario.Create;

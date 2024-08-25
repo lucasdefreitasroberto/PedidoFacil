@@ -2,8 +2,8 @@ object frmPrincipal: TfrmPrincipal
   Left = 0
   Top = 0
   Caption = 'Servidor Horse'
-  ClientHeight = 87
-  ClientWidth = 261
+  ClientHeight = 118
+  ClientWidth = 378
   Position = DesktopCenter
   FormFactor.Width = 320
   FormFactor.Height = 480
@@ -13,7 +13,7 @@ object frmPrincipal: TfrmPrincipal
   object Label1: TLabel
     Align = Top
     StyledSettings = [Family, FontColor]
-    Size.Width = 261.000000000000000000
+    Size.Width = 378.000000000000000000
     Size.Height = 27.000000000000000000
     Size.PlatformDefault = False
     TextSettings.Font.Size = 20.000000000000000000
@@ -25,11 +25,11 @@ object frmPrincipal: TfrmPrincipal
     Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
     DataDetectorTypes = []
     Align = Client
-    Size.Width = 261.000000000000000000
-    Size.Height = 60.000000000000000000
+    Size.Width = 378.000000000000000000
+    Size.Height = 91.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 1
-    Viewport.Width = 257.000000000000000000
-    Viewport.Height = 56.000000000000000000
+    Viewport.Width = 374.000000000000000000
+    Viewport.Height = 87.000000000000000000
   end
 end

@@ -7,9 +7,11 @@ uses
   Horse.HandleException,
   Horse.CORS,
   Horse.Jhonson,
+  Horse.OctetStream,
   Controller.Usuario,
   Controller.Notificacoes,
   Controller.Cliente,
+  Controller.Produto,
   System.SysUtils;
 
 type
@@ -31,7 +33,8 @@ begin
   THorse
   .Use(Jhonson())
   .Use(CORS)
-  .Use(HandleException);
+  .Use(HandleException)
+  .Use(OctetStream);
 end;
 {$ENDREGION}
 
@@ -41,6 +44,7 @@ begin
   Controller.Usuario.RegistrarRotas;
   Controller.Notificacoes.RegistrarRotas;
   Controller.Cliente.RegistrarRotas;
+  Controller.Produto.RegistrarRotas;
 end;
 {$ENDREGION}
 
