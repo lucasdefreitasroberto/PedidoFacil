@@ -64,7 +64,7 @@ end;
 procedure TDescVazioValidation.Validate;
 begin
   if (FNome = EmptyStr) then
-    raise EHorseException.New.Error('Nome do Produto precisa ser informado')
+    raise EHorseException.New.Error('Nome do Produto precisa ser informado').Status(THTTPStatus.PaymentRequired)
 end;
 
 { TVerificaFoto }
@@ -78,7 +78,7 @@ procedure TVerificaFoto.Validate;
 begin
   try
     if (FFoto.Size = 0) then
-      raise EHorseException.New.Error('Este Produto não possui foto cadastrada')
+      raise EHorseException.New.Error('Este Produto não possui foto cadastrada').Status(THTTPStatus.Continue)
   finally
     FFoto.Free;
   end;

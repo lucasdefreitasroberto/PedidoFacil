@@ -110,9 +110,14 @@ var
   LSQL : string;
   resultado :TJSONObject;
 begin
-  var LCodigoUsuario := Controller.Auth.Get_Usuario_Request(Req);
-  var LClienteData   := Self.ExtrairClienteData(ACliente);
-  var LNomeValidate  := TNomeVazioValidation.Create(LClienteData.Nome);
+  var
+  LCodigoUsuario := Controller.Auth.Get_Usuario_Request(Req);
+
+  var
+  LClienteData := Self.ExtrairClienteData(ACliente);
+
+  var
+  LNomeValidate := TNomeVazioValidation.Create(LClienteData.Nome);
 
   try
     LNomeValidate.Validate;

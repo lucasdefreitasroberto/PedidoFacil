@@ -12,7 +12,9 @@ uses
   System.SysUtils,
   Horse.Exception,
   System.Classes,
-  Horse.OctetStream;
+  Horse.OctetStream,
+  FireDAC.Stan.Intf,
+  FireDAC.Stan.StorageBin;
 
 type
   TQueryFD = class(TInterfacedObject, iQuery)
@@ -26,6 +28,7 @@ type
     function StartTransaction: iQuery;
     function SQL(Value: string): iQuery;
     function Params(aParams: string; Value: Variant): iQuery; overload;
+    function Params(aParams: string; Value: TPersistent): iQuery; overload;
     function Params(aParams: string): Variant; overload;
     function Open: iQuery;
     function ExecSQL: iQuery;
@@ -35,7 +38,8 @@ type
     function Rollback: iQuery;
     function ToJSONObject: TJSONObject;
     function ToJSONArray: TJSONArray;
-    function ToBlobStream(AValue: string): TStream;
+    function ToBlobStream(aParams: string): TStream;
+    function ToStream: TStream;
     procedure Free;
   end;
 
@@ -50,6 +54,7 @@ begin
 
   FDQuery := TFDQuery.Create(nil);
   FDQuery.Connection := FDBaseConexao.con;
+  FDQuery.DisableControls;
 end;
 
 destructor TQueryFD.Destroy;
@@ -88,9 +93,9 @@ begin
   FDQuery.ExecSQL(True);
 end;
 
-function TQueryFD.ToBlobStream(AValue: string): TStream;
+function TQueryFD.ToBlobStream(aParams: string): TStream;
 begin
-  Result := FDQuery.CreateBlobStream(FDQuery.FieldByName(AValue), TBlobStreamMode.bmRead);
+  Result := FDQuery.CreateBlobStream(FDQuery.FieldByName(aParams), TBlobStreamMode.bmRead);
 end;
 
 function TQueryFD.ToJSONArray: TJSONArray;
@@ -103,10 +108,23 @@ begin
   Result := FDQuery.ToJSONObject;
 end;
 
+function TQueryFD.ToStream: TStream;
+begin
+  Result := TMemoryStream.Create;
+  FDQuery.SaveToStream(Result, sfBinary);
+  Result.Position := 0;
+end;
+
 function TQueryFD.Open: iQuery;
 begin
   Result := Self;
   FDQuery.Open;
+end;
+
+function TQueryFD.Params(aParams: string; Value: TPersistent): iQuery;
+begin
+  Result := Self;
+  FDQuery.ParamByName(aParams).Assign(Value);
 end;
 
 function TQueryFD.Params(aParams: string; Value: Variant): iQuery;

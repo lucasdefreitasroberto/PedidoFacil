@@ -29,7 +29,7 @@ begin
   try
 
     try
-      LJsonRetorno := LService.SListarNotificacoes(Req.Body<TJSONObject>, Req);
+      LJsonRetorno := LService.SListarNotificacoes(Req);
       Res.Send<TJSONArray>(LJsonRetorno).Status(THTTPStatus.OK);
     except
       on ex: Exception do

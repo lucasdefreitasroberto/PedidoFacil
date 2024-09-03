@@ -16,8 +16,7 @@ type
     ['{FD8231AB-EE6C-4B74-933D-5CE48B1C3024}']
     function ExecuteScalar(const SQL: string): Variant;
     function ExecuteReader(const SQL: string): TDataSet;
-    procedure ExecuteCommand(const SQL: string; const Params: array of Variant;
-      const ParamNames: array of string);
+    procedure ExecuteCommand(const SQL: string; const ParamNames: array of string; const Params: array of Variant);
   end;
 
   TQueryExecutor = class(TInterfacedObject, IQueryExecutor)
@@ -30,8 +29,7 @@ type
     destructor Destroy; override;
     function ExecuteScalar(const SQL: string): Variant;
     function ExecuteReader(const SQL: string): TDataSet;
-    procedure ExecuteCommand(const SQL: string; const Params: array of Variant;
-      const ParamNames: array of string);
+    procedure ExecuteCommand(const SQL: string; const ParamNames: array of string; const Params: array of Variant);
   end;
 
 implementation
@@ -113,8 +111,7 @@ end;
 {$ENDREGION}
 
 {$REGION ' ExecuteCommand '}
-procedure TQueryExecutor.ExecuteCommand(const SQL: string;
-  const Params: array of Variant; const ParamNames: array of string);
+procedure TQueryExecutor.ExecuteCommand(const SQL: string; const ParamNames: array of string; const Params: array of Variant);
 var
   Query: TFDQuery;
   I: Integer;

@@ -23,7 +23,7 @@ type
   private
     procedure MarcarNotificacoesLidas(CodUsuario: Integer);
   public
-    function SListarNotificacoes(const ANotificacoes: TJSONObject; Req: THorseRequest ): TJSONArray;
+    function SListarNotificacoes(Req: THorseRequest): TJSONArray;
   end;
 implementation
 
@@ -54,7 +54,7 @@ end;
 
 {$REGION ' SListarNotificacoes '}
 
-function TServicesNotificacoes.SListarNotificacoes(const ANotificacoes: TJSONObject; Req: THorseRequest ): TJSONArray;
+function TServicesNotificacoes.SListarNotificacoes(Req: THorseRequest): TJSONArray;
 begin
   var LCodigoUsuario := Controller.Auth.Get_Usuario_Request(Req);
 

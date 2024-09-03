@@ -20,7 +20,9 @@ uses
   Horse,
   Interfaces.Conexao,
   Classe.Conexao,
-  Validations.Produto;
+  Validations.Produto,
+  Horse.Upload,
+  FMX.Graphics;
 
 type
   TProdutoData = record
@@ -38,23 +40,25 @@ type
     function SQLInsertProduto: string;
     function SQLUpdateProduto: string;
     function SQLListarProduto: string;
-    function SQLFotoProduto: string;
+    function SQLListarFotoProduto: string;
+    function SQLEditarFotoProduto: string;
     function ExtrairProdutoData(const Aproduto: TJSONObject): TProdutoData;
   public
-    function SListarProdutos(const Aproduto:TJSONObject; Req: THorseRequest): TJSONArray;
-    function SInserirProduto(const Aproduto: TJSONObject; Req: THorseRequest): TJSONObject;
-    function SListarFotoProduto(const Aproduto: TJSONObject; Req: THorseRequest): TStream;
+    function SListarProdutos(Req: THorseRequest): TJSONArray;
+    function SInserirProduto(Req: THorseRequest): TJSONObject;
+    function SListarFotoProduto(CodProduto: integer): TStream;
+    procedure SEditarFotoProduto(CodProduto: Integer; Foto: TBitmap);
   end;
 
 const
-  QTD_REG_PAGINA_PRODUTOS = 5; //Limite de Registro por Pagina
+  QTD_REG_PAGINA_PRODUTOS = 100; //Limite de Registro por Pagina
 
 implementation
 
 { TServicesProduto }
 
 {$REGION ' SListarProdutos '}
-function TServicesProduto.SListarProdutos(const Aproduto:TJSONObject; Req: THorseRequest): TJSONArray;
+function TServicesProduto.SListarProdutos(Req: THorseRequest): TJSONArray;
 var
    LPagina : integer;
 begin
@@ -65,15 +69,21 @@ begin
     LPagina := 1;
   end;
 
-  var LDtUltSincronizacao := Req.Query['dt_ult_sincronizacao'];
-  var LDtUltSincVazia := TDtUltSincVaziaValidation.Create(LDtUltSincronizacao);
-  var LSkip := (LPagina * QTD_REG_PAGINA_PRODUTOS) - QTD_REG_PAGINA_PRODUTOS;
-  var LSQL := Self.SQLListarProduto;
+  var
+  LSkip := (LPagina * QTD_REG_PAGINA_PRODUTOS) - QTD_REG_PAGINA_PRODUTOS;
 
-  var FQuery := TQueryFD.Create;
+  var
+  LDtUltSincronizacao := Req.Query['dt_ult_sincronizacao'];
+
+  var
+  LDtUltSincVazia := TDtUltSincVaziaValidation.Create(LDtUltSincronizacao);
+  LDtUltSincVazia.Validate;
+
+  var
+  FQuery := TQueryFD.Create;
   try
     Result := FQuery
-                .SQL(LSQL)
+                .SQL(Self.SQLListarProduto())
                 .Params('FIRST', QTD_REG_PAGINA_PRODUTOS)
                 .Params('SKIP', LSkip)
                 .Params('DATA_ULT_ALTERACAO', LDtUltSincronizacao)
@@ -85,17 +95,24 @@ begin
   end;
 
 end;
-
 {$ENDREGION}
 
 {$REGION ' SInserirProduto '}
-function TServicesProduto.SInserirProduto(const Aproduto: TJSONObject; Req: THorseRequest): TJSONObject;
+function TServicesProduto.SInserirProduto(Req: THorseRequest): TJSONObject;
 var
   LSQL : string;
 begin
-  var LCodigoUsuario := Controller.Auth.Get_Usuario_Request(Req);
-  var LProdutoDados  := Self.ExtrairProdutoData(Aproduto);
-  var LDescricaoProdValidate := TDescVazioValidation.Create(LProdutoDados.Descricao);
+  var
+  LProduto := Req.Body<TJSONObject>;
+
+  var
+  LCodigoUsuario := Controller.Auth.Get_Usuario_Request(Req);
+
+  var
+  LProdutoDados := Self.ExtrairProdutoData(LProduto);
+
+  var
+  LDescricaoProdValidate := TDescVazioValidation.Create(LProdutoDados.Descricao);
 
   try
     LDescricaoProdValidate.Validate;
@@ -108,7 +125,8 @@ begin
   else
     LSQL := Self.SQLUpdateProduto;
 
-  var FQuery := TQueryFD.Create;
+  var
+  FQuery := TQueryFD.Create;
   try
     Result :=
       FQuery
@@ -132,12 +150,12 @@ end;
 {$REGION ' ExtrairProdutoData '}
 function TServicesProduto.ExtrairProdutoData(const Aproduto: TJSONObject): TProdutoData;
 begin
-  Result.CodProdutoLocal      := Aproduto.GetValue<Integer>('COD_PRODUTO_LOCAL', 0);
-  Result.Descricao            := Aproduto.GetValue<string>('DESCRICAO', '');
-  Result.Valor                := Aproduto.GetValue<Double>('VALOR', 0);
-  Result.Qtdstoque            := Aproduto.GetValue<Double>('QTD_ESTOQUE', 0);
-  Result.DataUltAlteracao     := Aproduto.GetValue<string>('DATA_ULT_ALTERACAO', '');
-  Result.CodProdutoOficial    := Aproduto.GetValue<Integer>('COD_PRODUTO_OFICIAL', 0);
+  Result.CodProdutoLocal   :=  Aproduto.GetValue<Integer>('COD_PRODUTO_LOCAL', 0);
+  Result.Descricao         :=  Aproduto.GetValue<string>('DESCRICAO', '');
+  Result.Valor             :=  Aproduto.GetValue<Double>('VALOR', 0);
+  Result.Qtdstoque         :=  Aproduto.GetValue<Double>('QTD_ESTOQUE', 0);
+  Result.DataUltAlteracao  :=  Aproduto.GetValue<string>('DATA_ULT_ALTERACAO', '');
+  Result.CodProdutoOficial :=  Aproduto.GetValue<Integer>('COD_PRODUTO_OFICIAL', 0);
 end;
 {$ENDREGION}
 
@@ -159,8 +177,6 @@ end;
 {$ENDREGION}
 
 {$REGION ' SQL-InsertSQLProduto '}
-
-
 function TServicesProduto.SQLInsertProduto: string;
 begin
   Result :=
@@ -188,48 +204,82 @@ end;
 {$ENDREGION}
 
 {$REGION ' SListarFotoProduto '}
-function TServicesProduto.SListarFotoProduto(const Aproduto: TJSONObject; Req: THorseRequest): TStream;
+function TServicesProduto.SListarFotoProduto(CodProduto: integer): TStream;
 var
-  CodProduto : Integer; //Rota => /produto/foto/10
+  LCodProduto : Integer; //Rota => /produto/foto/10
   Foto : TStream;
   LTVerificaFoto : TVerificaFoto;
 begin
 
-  try
-    CodProduto := Req.Params.Items['codProduto'].ToInteger;
-  except
-    CodProduto := 0;
-  end;
-
   var
-    FQuery := TQueryFD.Create;
+  FQuery := TFDQuery.Create(nil);
+
+  FQuery.Connection := Self.con;
   try
-    Foto :=
-      FQuery
-        .SQL(SQLFotoProduto)
-        .Params('COD_PRODUTO', CodProduto)
-        .Open
-        .ToBlobStream('FOTO');
 
-    LTVerificaFoto := TVerificaFoto.Create(Foto);
-    LTVerificaFoto.Validate;
+    with FQuery do
+    begin
+      Active := False;
+      SQL.Clear;
+      SQL.Add(Self.SQLListarFotoProduto);
+      ParamByName('COD_PRODUTO').value := LCodProduto;
+      Active := True;
+    end;
 
-    Result := Foto;
+    Result := FQuery.CreateBlobStream(FQuery.FieldByName('FOTO'), TBlobStreamMode.bmRead);
+
   finally
     FQuery.Free;
-    LTVerificaFoto.Free;
+  end;
+
+end;
+{$ENDREGION}
+
+{$REGION ' SEditarFotoProduto '}
+procedure TServicesProduto.SEditarFotoProduto(CodProduto: Integer; Foto: TBitmap);
+var
+  FQuery: TFDQuery;
+begin
+  FQuery := TFDQuery.Create(nil);
+  FQuery.Connection := Self.con;
+  try
+
+    with FQuery do
+    begin
+      Active := False;
+      SQL.Clear;
+      SQL.Add(Self.SQLEditarFotoProduto);
+      ParamByName('FOTO_PRODUTO').Assign(Foto);
+      ParamByName('COD_PRODUTO').Value := CodProduto;
+      ExecSQL;
+    end;
+
+  finally
+    FQuery.Free;
   end;
 end;
 {$ENDREGION}
 
-{$REGION ' SQL-FotoProduto '}
-function TServicesProduto.SQLFotoProduto: string;
+{$REGION ' SQL-ListarFotoProduto '}
+function TServicesProduto.SQLListarFotoProduto: string;
 begin
-  Result := ' select ' +
-            ' FOTO ' +
-            ' from PRODUTO ' +
-            ' where COD_PRODUTO = :COD_PRODUTO ';
+  Result :=
+  ' select ' +
+  ' FOTO ' +
+  ' from PRODUTO ' +
+  ' where COD_PRODUTO = :COD_PRODUTO ';
 end;
+{$ENDREGION}
+
+{$REGION ' SQL-EditarProduto '}
+function TServicesProduto.SQLEditarFotoProduto: string;
+begin
+  Result :=
+  ' update PRODUTO '+
+  ' set PRODUTO.FOTO = :FOTO_PRODUTO '+
+  ' where PRODUTO.COD_PRODUTO = :COD_PRODUTO ';
+end;
+
 {$ENDREGION}
 
 end.

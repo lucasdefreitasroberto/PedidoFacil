@@ -12,7 +12,8 @@ uses
   Controller.Notificacoes,
   Controller.Cliente,
   Controller.Produto,
-  System.SysUtils;
+  System.SysUtils,
+  Horse.Upload;
 
 type
   TServerHorse = class
@@ -34,7 +35,8 @@ begin
   .Use(Jhonson())
   .Use(CORS)
   .Use(HandleException)
-  .Use(OctetStream);
+  .Use(OctetStream)
+  .Use(Upload);
 end;
 {$ENDREGION}
 

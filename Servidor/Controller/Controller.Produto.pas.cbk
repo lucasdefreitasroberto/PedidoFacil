@@ -1,4 +1,4 @@
-unit Controller.Produto;
+Ôªøunit Controller.Produto;
 
 interface
 
@@ -123,7 +123,7 @@ begin
   try
 
     LUploadConfig := TUploadConfig.Create(ExtractFilePath(ParamStr(0)) + 'fotos'); //Caminho Exe + Pasta fotos
-    LUploadConfig.ForceDir := True;      // Se n„o achar pasta fotos ele vai criar ela.
+    LUploadConfig.ForceDir := True;      // Se n√£o achar pasta fotos ele vai criar ela.
     LUploadConfig.OverrideFiles := True; // Se for subir um arquivo que ja existe ele sobrescreve
 
     LUploadConfig.UploadFileCallBack :=
@@ -144,10 +144,11 @@ begin
   end;
 
    Res.Send<TUploadConfig>(LUploadConfig);
+   LUploadConfig.Free;
 
-   {N„o posso destruir meu processo depois que a aplicaÁ„o e executada,
+   {N√£o posso destruir meu processo depois que a aplica√ß√£o e executada,
      o UploadFileCallBack e executado depois que todo o processo e rodado,
-     N„o verifiquei afundo ainda a chamada, assim que verificar preciso comentar sobre}
+     N√£o verifiquei afundo ainda a chamada, assim que verificar preciso comentar sobre}
 end;
 {$ENDREGION}
 

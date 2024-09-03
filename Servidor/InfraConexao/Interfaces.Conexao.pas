@@ -13,6 +13,7 @@ type
     function StartTransaction: iQuery;
     function SQL(Value: string): iQuery;
     function Params(aParams: string; Value: Variant): iQuery; overload;
+    function Params(aParams: string; Value: TPersistent): iQuery; overload;
     function Params(aParams: string): Variant; overload;
     function Open: iQuery;
     function ExecSQL: iQuery;
@@ -22,7 +23,8 @@ type
     function Rollback: iQuery;
     function ToJSONObject: TJSONObject;
     function ToJSONArray: TJSONArray;
-    function ToBlobStream(AValue: string): TStream;
+    function ToBlobStream(aParams: string): TStream;
+    function ToStream: TStream;
     procedure Free;
   end;
 
