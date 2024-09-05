@@ -18,11 +18,13 @@ procedure RegistrarRotas;
 implementation
 
 {$REGION ' CInserirUsuarios '}
+
 procedure CInserirUsuario(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 var
   LJsonRetorno: TJSONObject;
-  LCodigoUser : Integer;
-  LService : TServicesUsuario;
+  LCodigoUser: Integer;
+  LService: TServicesUsuario;
+  LTokenResult: TTokenResult;
 begin
   LService := TServicesUsuario.Create;
   try
@@ -30,7 +32,14 @@ begin
     try
       LJsonRetorno := LService.SInserirUsuarios(Req.Body<TJSONObject>);
       LCodigoUser := LJsonRetorno.GetValue<Integer>('cod_usuario', 0);
-      LJsonRetorno.AddPair('token', Criar_Token(LCodigoUser)); {GERANDO TOKEN PELO ID}
+      // LJsonRetorno.AddPair('token', Criar_Token(LCodigoUser)); {GERANDO TOKEN PELO ID}
+
+      LTokenResult := Criar_Token(LCodigoUser);
+
+      LJsonRetorno.AddPair('token', LTokenResult.Token);
+      LJsonRetorno.AddPair('exp',
+        TJSONString.Create(FormatDateTime('dd-mm-yyyy hh:nn:ss',
+        LTokenResult.Expiration)));
 
       Res.Send<TJSONObject>(LJsonRetorno).Status(THTTPStatus.Created);
     except
@@ -45,11 +54,13 @@ end;
 {$ENDREGION}
 
 {$REGION ' CLogin '}
+
 procedure CLogin(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 var
   LService: TServicesUsuario;
   LJsonRetorno: TJSONObject;
   LCodigoUser: Integer;
+  LTokenResult: TTokenResult;
 begin
   LService := TServicesUsuario.Create;
   try
@@ -62,7 +73,12 @@ begin
       else
       begin
         LCodigoUser := LJsonRetorno.GetValue<Integer>('cod_usuario', 0);
-        LJsonRetorno.AddPair('token', Criar_Token(LCodigoUser));
+        LTokenResult := Criar_Token(LCodigoUser);
+        LJsonRetorno.AddPair('token', LTokenResult.Token);
+        LJsonRetorno.AddPair('exp',
+          TJSONString.Create(FormatDateTime('dd-mm-yyyy hh:nn:ss',
+          LTokenResult.Expiration)));
+
         Res.Send<TJSONObject>(LJsonRetorno).Status(THTTPStatus.Created);
       end;
     except
@@ -103,7 +119,7 @@ end;
 procedure CEditarUsuario(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 var
   LJsonRetorno: TJSONObject;
-  LService : TServicesUsuario;
+  LService: TServicesUsuario;
 begin
   LService := TServicesUsuario.Create;
   try
@@ -126,7 +142,7 @@ end;
 procedure CEditarSenha(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 var
   LJsonRetorno: TJSONObject;
-  LService : TServicesUsuario;
+  LService: TServicesUsuario;
 begin
   LService := TServicesUsuario.Create;
   try
@@ -146,9 +162,10 @@ end;
 {$ENDREGION}
 
 {$REGION ' ObterDataHoraServidor '}
-procedure ObterDataHoraServidor(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+procedure ObterDataHoraServidor(Req: THorseRequest; Res: THorseResponse;
+  Next: TProc);
 var
-  LService : TServicesUsuario;
+  LService: TServicesUsuario;
 begin
   LService := TServicesUsuario.Create;
   try

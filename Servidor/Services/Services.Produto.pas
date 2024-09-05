@@ -46,7 +46,7 @@ type
   public
     function SListarProdutos(Req: THorseRequest): TJSONArray;
     function SInserirProduto(Req: THorseRequest): TJSONObject;
-    function SListarFotoProduto(CodProduto: integer): TStream;
+    function SListarFotoProduto(CodProduto: integer): TMemoryStream;
     procedure SEditarFotoProduto(CodProduto: Integer; Foto: TBitmap);
   end;
 
@@ -204,35 +204,43 @@ end;
 {$ENDREGION}
 
 {$REGION ' SListarFotoProduto '}
-function TServicesProduto.SListarFotoProduto(CodProduto: integer): TStream;
+function TServicesProduto.SListarFotoProduto(CodProduto: Integer): TMemoryStream;
 var
-  LCodProduto : Integer; //Rota => /produto/foto/10
-  Foto : TStream;
-  LTVerificaFoto : TVerificaFoto;
+  FQuery: TFDQuery;
+  LStream: TStream;
 begin
-
-  var
   FQuery := TFDQuery.Create(nil);
-
   FQuery.Connection := Self.con;
   try
-
     with FQuery do
     begin
       Active := False;
       SQL.Clear;
       SQL.Add(Self.SQLListarFotoProduto);
-      ParamByName('COD_PRODUTO').value := LCodProduto;
+      ParamByName('COD_PRODUTO').AsInteger := CodProduto;
       Active := True;
+
+      if not FieldByName('FOTO').IsNull then
+      begin
+        LStream := FQuery.CreateBlobStream(FQuery.FieldByName('FOTO'),
+          TBlobStreamMode.bmRead);
+        try
+          Result := TMemoryStream.Create;
+          Result.LoadFromStream(LStream);
+        finally
+          LStream.Free;
+        end;
+      end
+      else
+        raise EHorseException.New.Error
+          ('Este Produto não possui foto cadastrada')
+          .Status(THTTPStatus.Continue);
     end;
-
-    Result := FQuery.CreateBlobStream(FQuery.FieldByName('FOTO'), TBlobStreamMode.bmRead);
-
   finally
     FQuery.Free;
   end;
-
 end;
+
 {$ENDREGION}
 
 {$REGION ' SEditarFotoProduto '}

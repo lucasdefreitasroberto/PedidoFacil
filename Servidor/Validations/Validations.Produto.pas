@@ -31,14 +31,6 @@ type
     procedure Validate;
   end;
 
-  TVerificaFoto = class(TBaseValidation)
-  private
-    FFoto: TStream;
-  public
-    constructor Create(const Foto: TStream);
-    procedure Validate;
-  end;
-
 implementation
 
 { TDtUltSincronizacaoVaziaValidation }
@@ -65,23 +57,6 @@ procedure TDescVazioValidation.Validate;
 begin
   if (FNome = EmptyStr) then
     raise EHorseException.New.Error('Nome do Produto precisa ser informado').Status(THTTPStatus.PaymentRequired)
-end;
-
-{ TVerificaFoto }
-
-constructor TVerificaFoto.Create(const Foto: TStream);
-begin
-  FFoto := Foto;
-end;
-
-procedure TVerificaFoto.Validate;
-begin
-  try
-    if (FFoto.Size = 0) then
-      raise EHorseException.New.Error('Este Produto não possui foto cadastrada').Status(THTTPStatus.Continue)
-  finally
-    FFoto.Free;
-  end;
 end;
 
 end.

@@ -16,6 +16,12 @@ const
   SECRET = '[LUCAS-SECRET-KEY]';
 
 type
+  TTokenResult = record
+    Token: string;
+    Expiration: TDateTime;
+  end;
+
+type
   TMyClaims = class(TJWTClaims)
   private
     function GetCodUsuario: Integer;
@@ -24,13 +30,13 @@ type
     property COD_USUARIO: Integer read GetCodUsuario write SetCodUsuario;
   end;
 
-function Criar_Token(Cod_Usuario: Integer): string;
+function Criar_Token(Cod_Usuario: Integer): TTokenResult;
 function Get_Usuario_Request(Req: THorseRequest): Integer;
 
 implementation
 
 {$REGION ' Criar_Token '}
-function Criar_Token(Cod_Usuario: Integer): string;
+function Criar_Token(Cod_Usuario: Integer): TTokenResult;
 var
   LJWT: TJWT;
   LClaims: TMyClaims;
@@ -41,12 +47,15 @@ begin
 
     try
       LClaims.COD_USUARIO := Cod_Usuario;
-     // LClaims.Expiration := IncHour(Now, 1);  Removir o Token Expiration
-      Result := TJOSE.SHA256CompactToken(SECRET, LJWT);
+      //LClaims.Expiration := DateTimeToUnix(IncDay(Now, 2));
+      LClaims.Expiration := IncDay(Now, 2); // Remove o Token Expiration
+      //Result := TJOSE.SHA256CompactToken(SECRET, LJWT);
+      Result.Token := TJOSE.SHA256CompactToken(SECRET, LJWT);
+      Result.Expiration := LClaims.Expiration;
     except
       on E: Exception do
       begin
-        Result := '';
+        Result.Token := '';
         raise Exception.Create('Erro ao criar o token: ' + E.Message);
       end;
     end;
@@ -76,8 +85,6 @@ begin
   end;
 end;
 {$ENDREGION}
-
-{ TMyClaims }
 
 {$REGION ' GetCodUsuario '}
 function TMyClaims.GetCodUsuario: Integer;

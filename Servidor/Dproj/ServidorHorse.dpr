@@ -30,6 +30,6 @@ uses
 begin
   Application.Initialize;
   Application.CreateForm(TfrmPrincipal, frmPrincipal);
-  ReportMemoryLeaksOnShutdown := True;
+ // ReportMemoryLeaksOnShutdown := True;
   Application.Run;
 end.

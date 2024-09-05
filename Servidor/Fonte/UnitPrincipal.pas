@@ -47,7 +47,8 @@ begin
   TServerHorse.StartServer(9000);
 
   if TServerHorse.VerifyStartingHorse then
-    mmo.Lines.Add('Servidor executando na porta: ' + TServerHorse.PortRunner);
+    mmo.Lines.Add('Servidor executando na porta: ' + TServerHorse.PortRunner +
+      sLineBreak + 'Log: '+DateTimeToStr(Now));
 end;
 {$ENDREGION}
 

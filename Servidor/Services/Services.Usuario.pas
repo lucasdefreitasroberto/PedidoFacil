@@ -68,7 +68,7 @@ begin
     Result := FQuery
                .SQL(LSQL)
                .Params('NOME', LNome)
-               .Params('SENHA', LSenha)
+               .Params('SENHA', SaltPassword(LSenha))
                .Params('EMAIL', LEmail)
                .Open
                .ToJSONObject;
@@ -97,13 +97,15 @@ begin
               ' USU.NOME, '+
               ' USU.EMAIL '+
               ' from USUARIO USU '+
-              ' where USU.EMAIL = '+QuotedStr(LEmail.ToLower)+' and '+
-              ' USU.SENHA = '+QuotedStr(SaltPassword(LSenha));
+              ' where USU.EMAIL = :EMAIL and '+
+              ' USU.SENHA = :SENHA';
 
   var FQuery := TQueryFD.Create;
   try
     Result := FQuery
                 .SQL(LSQL)
+                .Params('EMAIL', LEmail)
+                .Params('SENHA', SaltPassword(LSenha))
                 .Open
                 .ToJSONObject;
   finally
@@ -225,7 +227,7 @@ end;
 {$REGION ' SObterDataServidor '}
 function TServicesUsuario.SObterDataHoraServidor: String;
 begin
-  Result := FormatDateTime('yyyy-mm-dd hh:nn:ss', Now);
+  Result := FormatDateTime('dd-mm-yyyy hh:nn:ss', Now);
 end;
 {$ENDREGION}
 

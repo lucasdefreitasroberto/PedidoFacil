@@ -78,21 +78,20 @@ end;
 procedure CListarFotoProduto(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 var
   LService : TServicesProduto;
-  LStreamRetorno : TStream;
   LCodProduto : Integer;
 begin
   LService := TServicesProduto.Create;
   try
 
     try
-      LCodProduto := Req.Params.Items['codproduto'].ToInteger;  //Rota => /produto/foto/10
+      LCodProduto := Req.Params.Items['codproduto'].ToInteger;
     except
       LCodProduto := 0;
     end;
 
     try
-      LStreamRetorno := LService.SListarFotoProduto(LCodProduto);
-      Res.Send<TStream>(LStreamRetorno).Status(THTTPStatus.OK);
+      Res.Send<TMemoryStream>(LService.SListarFotoProduto(LCodProduto))
+        .Status(THTTPStatus.OK);
     except
       on ex: Exception do
         Res.Send(ex.Message).Status(500);
@@ -146,8 +145,8 @@ begin
    Res.Send<TUploadConfig>(LUploadConfig);
 
    {Não posso destruir meu processo depois que a aplicação e executada,
-     o UploadFileCallBack e executado depois que todo o processo e rodado,
-     Não verifiquei afundo ainda a chamada, assim que verificar preciso comentar sobre}
+    o UploadFileCallBack e executado depois que todo o processo e rodado,
+    Não verifiquei afundo ainda a chamada, assim que verificar preciso comentar sobre}
 end;
 {$ENDREGION}
 
@@ -161,12 +160,12 @@ begin
   THorse.AddCallback(HorseJWT(Controller.Auth.SECRET, THorseJWTConfig.New.SessionClass(TMyClaims)))
   .Post('/produtos/sincronizacao',
   CInserirProduto);
-//
-//  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET, THorseJWTConfig.New.SessionClass(TMyClaims)))
-//  .Get('/produtos/foto/:codproduto',
-//  CListarFotoProduto);
 
- THorse.Get('/produtos/foto/:codproduto', CListarFotoProduto);
+  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET, THorseJWTConfig.New.SessionClass(TMyClaims)))
+  .Get('/produtos/foto/:codproduto',
+  CListarFotoProduto);
+
+  //THorse.Get('/produtos/foto/:codproduto', CListarFotoProduto);
 
   THorse.AddCallback(HorseJWT(Controller.Auth.SECRET, THorseJWTConfig.New.SessionClass(TMyClaims)))
   .Put('/produtos/foto/:codproduto',

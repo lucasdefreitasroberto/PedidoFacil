@@ -2,7 +2,7 @@ object frmPrincipal: TfrmPrincipal
   Left = 0
   Top = 0
   Caption = 'Servidor Horse'
-  ClientHeight = 118
+  ClientHeight = 181
   ClientWidth = 378
   Position = DesktopCenter
   FormFactor.Width = 320
@@ -14,22 +14,24 @@ object frmPrincipal: TfrmPrincipal
     Align = Top
     StyledSettings = [Family, FontColor]
     Size.Width = 378.000000000000000000
-    Size.Height = 27.000000000000000000
+    Size.Height = 33.000000000000000000
     Size.PlatformDefault = False
     TextSettings.Font.Size = 20.000000000000000000
     TextSettings.Font.StyleExt = {00070000000000000004000000}
-    Text = '  Servidor'
+    TextSettings.HorzAlign = Center
     TabOrder = 0
   end
   object mmo: TMemo
     Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
     DataDetectorTypes = []
+    StyledSettings = [Family, Style, FontColor]
+    TextSettings.Font.Size = 13.000000000000000000
     Align = Client
     Size.Width = 378.000000000000000000
-    Size.Height = 91.000000000000000000
+    Size.Height = 148.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 1
     Viewport.Width = 374.000000000000000000
-    Viewport.Height = 87.000000000000000000
+    Viewport.Height = 144.000000000000000000
   end
 end
