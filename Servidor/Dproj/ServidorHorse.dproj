@@ -262,8 +262,7 @@
             <FormType>fmx</FormType>
         </DCCReference>
         <DCCReference Include="..\controller\Controller.Usuario.pas">
-            <Form>,
-  DM.Conexao in &apos;..\DataModule\DM.Conexao.pas&apos; {DMConexao</Form>
+            <Form>DM.Conexao in &apos;..\DataModule\DM.Conexao.pas&apos; {DMConexao</Form>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="..\DataModule\DM.Conexao.pas">
@@ -287,6 +286,10 @@
         <DCCReference Include="..\Services\Services.Produto.pas"/>
         <DCCReference Include="..\Validations\Validations.Produto.pas"/>
         <DCCReference Include="..\Validations\Validations.pas"/>
+        <DCCReference Include="..\Controller\Controller.Pedido.pas"/>
+        <DCCReference Include="..\Services\Services.Pedido.pas"/>
+        <DCCReference Include="..\Sql\SQL.Pedido.pas"/>
+        <DCCReference Include="..\Validations\Validations.Pedido.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

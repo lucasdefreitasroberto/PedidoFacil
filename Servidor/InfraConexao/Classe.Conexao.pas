@@ -103,7 +103,7 @@ begin
   Result := FDQuery.ToJSONArray;
 end;
 
-function TQueryFD.ToJSONObject: TJSONObject;
+                                                  function TQueryFD.ToJSONObject: TJSONObject;
 begin
   Result := FDQuery.ToJSONObject;
 end;

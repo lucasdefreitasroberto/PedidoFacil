@@ -12,6 +12,7 @@ uses
   Controller.Notificacoes,
   Controller.Cliente,
   Controller.Produto,
+  Controller.Pedido,
   System.SysUtils,
   Horse.Upload;
 
@@ -47,6 +48,7 @@ begin
   Controller.Notificacoes.RegistrarRotas;
   Controller.Cliente.RegistrarRotas;
   Controller.Produto.RegistrarRotas;
+  Controller.Pedido.RegistrarRotas;
 end;
 {$ENDREGION}
 
