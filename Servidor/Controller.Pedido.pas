@@ -32,26 +32,15 @@ begin
       Result := ServicesPedido.SListarPedidos(Req);
     end);
 
-  // Usa o método da interface para lidar com a requisição e resposta
-  RequestHandler.HandleRequestAndRespond(Req, Res);
-
-// Desta forma ele implementa a classe direto e o Delphi não faz a gerenciamento de memorio automatico
-// RequestHandler := TRequestHandler<TJSONArray>.Create(TServicesPedido.Create.SListarPedidos);
+  //RequestHandler := TRequestHandler<TJSONArray>.Create(TServicesPedido.Create.SListarPedidos); //  Passa o método de listar pedidos para o request handler
+  RequestHandler.HandleRequestAndRespond(Req, Res);  // Usa o método da interface para lidar com a requisição e resposta
 end;
 
 procedure CInserirEditarPedidos(Req: THorseRequest; Res: THorseResponse);
 var
-  RequestHandler: IRequestHandler<TJSONObject>;  // Uso da interface com TJSONArray
-  ServicesPedido: IServicesPedido;
+  RequestHandler: IRequestHandler<TJSONObject>;
 begin
-  ServicesPedido := TServicesPedido.Create;
-
-  RequestHandler := TRequestHandler<TJSONObject>.Create(
-    function(Req: THorseRequest): TJSONObject
-    begin
-      Result := ServicesPedido.SInserirEditarPedidos(Req);
-    end);
-
+  RequestHandler := TRequestHandler<TJSONObject>.Create(TServicesPedido.Create.SInserirEditarPedidos);
   RequestHandler.HandleRequestAndRespond(Req, Res);  // Usa o novo método diretamente
 end;
 

@@ -19,7 +19,7 @@ uses
   end;
 
   type
-  TServicesPedido = class(TInterfacedObject, IServicesPedido)
+  TServicesPedido = class(TDMConexao, IServicesPedido)
   private
     FPedidoRepository: IPedidoRepository;
   public
@@ -46,7 +46,7 @@ end;
 destructor TServicesPedido.Destroy;
 begin
   // Limpeza de recursos, se necessário
-  FPedidoRepository := nil;
+  FPedidoRepository := nil; // Libera a referência ao repositório
   inherited;
 end;
 

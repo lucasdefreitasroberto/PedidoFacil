@@ -21,6 +21,7 @@ type
 
     // Método para lidar com a requisição e enviar a resposta
     procedure HandleRequestAndRespond(Req: THorseRequest; Res: THorseResponse);
+    destructor Destroy; override;
 
    // Envia a resposta com o resultado de uma função genérica
     procedure SendResponse(Res: THorseResponse; const GetResult: TFunc<T>); overload;
@@ -44,6 +45,12 @@ implementation
 constructor TRequestHandler<T>.Create(const AServiceMethod: TFunc<THorseRequest, T>);
 begin
   FServiceMethod := AServiceMethod;
+end;
+
+destructor TRequestHandler<T>.Destroy;
+begin
+  FServiceMethod := nil;
+  inherited;
 end;
 
 // Procedimento que lida com a requisição e envia a resposta
@@ -78,7 +85,6 @@ begin
       Res.Send(E.Message).Status(THTTPStatus.InternalServerError);
     end;
   end;
-
 end;
 
 procedure TRequestHandler<T>.SendResponse(Res: THorseResponse; const GetResult: TFunc<T>);
