@@ -4,86 +4,44 @@ interface
 
 uses
   Horse,
-  Horse.CORS,
-  Horse.Jhonson,
   Horse.JWT,
-  Horse.OctetStream,
-  Horse.HandleException,
-  Horse.Commons,
-  IdSSLOpenSSLHeaders,
-  system.SysUtils,
-  system.JSON,
+  Horse.Jhonson,
+  Horse.CORS,
   Controller.Auth,
-  System.Classes,
-  Services.Pedido;
+  System.JSON,
+  Classes.Handler,
+  Services.Pedido,
+  Interfaces.Handler;
 
- procedure CListarPedidos(Req: THorseRequest; Res: THorseResponse);
- procedure CInserirEditarPedidos(Req: THorseRequest; Res: THorseResponse);
- procedure RegistrarRotas;
+procedure CListarPedidos(Req: THorseRequest; Res: THorseResponse);
+procedure CInserirEditarPedidos(Req: THorseRequest; Res: THorseResponse);
+procedure RegistrarRotas;
 
 implementation
 
-{$REGION ' CListarPedidos '}
-
 procedure CListarPedidos(Req: THorseRequest; Res: THorseResponse);
 var
-  LService : TServicesPedido;
-  LJsonRetorno : TJSONArray;
+  RequestHandler: IRequestHandler<TJSONArray>;  // Uso da interface com TJSONArray
 begin
-  LService := TServicesPedido.Create;
-  try
-
-    try
-      LJsonRetorno := LService.SListarPedidos(Req);
-      Res.Send<TJSONArray>(LJsonRetorno).Status(THTTPStatus.OK);
-    except
-      on ex: Exception do
-        Res.Send(ex.Message).Status(500);
-    end;
-
-  finally
-    FreeAndNil(LService);
-  end;
+  // Passa o método de listar pedidos para o request handler
+  RequestHandler := TRequestHandler<TJSONArray>.Create(TServicesPedido.Create.SListarPedidos);
+  RequestHandler.HandleRequestAndRespond(Req, Res);  // Usa o método da interface para lidar com a requisição e resposta
 end;
-
-{$ENDREGION}
-
-{$REGION ' CInserirEditarPedidos '}
 
 procedure CInserirEditarPedidos(Req: THorseRequest; Res: THorseResponse);
 var
-  LService : TServicesPedido;
-  LJsonRetorno : TJSONObject;
+  RequestHandler: IRequestHandler<TJSONObject>;
 begin
-  LService := TServicesPedido.Create;
-  try
-
-    try
-      LJsonRetorno := LService.SInserirEditarPedidos(Req);
-      Res.Send<TJSONObject>(LJsonRetorno).Status(THTTPStatus.OK);
-    except
-      on ex: Exception do
-        Res.Send(ex.Message).Status(500);
-    end;
-
-  finally
-    FreeAndNil(LService);
-  end;
+  RequestHandler := TRequestHandler<TJSONObject>.Create(TServicesPedido.Create.SInserirEditarPedidos);
+  RequestHandler.HandleRequestAndRespond(Req, Res);  // Usa o novo método diretamente
 end;
 
-{$ENDREGION}
-
-{$REGION ' Registra Rotas '}
 procedure RegistrarRotas;
 begin
   THorse.AddCallback(HorseJWT(Controller.Auth.SECRET, THorseJWTConfig.New.SessionClass(TMyClaims)))
-  .Get('/pedidos/sincronizacao',
-  CListarPedidos);
-
-   THorse.AddCallback(HorseJWT(Controller.Auth.SECRET, THorseJWTConfig.New.SessionClass(TMyClaims)))
-  .Post('/pedidos/sincronizacao',
-  CInserirEditarPedidos);
+    .Get('/pedidos/sincronizacao', CListarPedidos)
+    .Post('/pedidos/sincronizacao', CInserirEditarPedidos);
 end;
-{$ENDREGION}
 
 end.
+

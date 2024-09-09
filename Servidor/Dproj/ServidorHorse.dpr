@@ -4,7 +4,7 @@ uses
   System.StartUpCopy,
   FMX.Forms,
   UnitPrincipal in '..\fonte\UnitPrincipal.pas' {frmPrincipal},
-  Controller.Usuario in '..\controller\Controller.Usuario.pas' {DM.Conexao in '..\DataModule\DM.Conexao.pas' {DMConexao: TDataModule},
+  Controller.Usuario in '..\controller\Controller.Usuario.pas',
   DM.Conexao in '..\DataModule\DM.Conexao.pas' {DMConexao: TDataModule},
   Utilitarios in '..\Utils\Utilitarios.pas',
   Services.Usuario in '..\Services\Services.Usuario.pas',
@@ -26,13 +26,17 @@ uses
   Controller.Pedido in '..\Controller\Controller.Pedido.pas',
   Services.Pedido in '..\Services\Services.Pedido.pas',
   SQL.Pedido in '..\Sql\SQL.Pedido.pas',
-  Validations.Pedido in '..\Validations\Validations.Pedido.pas';
+  Validations.Pedido in '..\Validations\Validations.Pedido.pas',
+  Interfaces.Handler in '..\Handler\Interfaces.Handler.pas',
+  Classes.Handler in '..\Handler\Classes.Handler.pas',
+  Repository.Interfaces.IPedidoRepository in '..\Repository\Interfaces\Repository.Interfaces.IPedidoRepository.pas',
+  Repository.Classes.PedidoRepository in '..\Repository\Classes\Repository.Classes.PedidoRepository.pas';
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.CreateForm(TfrmPrincipal, frmPrincipal);
-  // ReportMemoryLeaksOnShutdown := True;
+   ReportMemoryLeaksOnShutdown := True;
   Application.Run;
 end.
