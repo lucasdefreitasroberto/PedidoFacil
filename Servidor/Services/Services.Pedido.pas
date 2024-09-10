@@ -45,15 +45,15 @@ end;
 
 destructor TServicesPedido.Destroy;
 begin
-  // Limpeza de recursos, se necessário
-  FPedidoRepository := nil;
+  FPedidoRepository := nil; //Limpeza de recursos, se necessário
   inherited;
 end;
 
+{$REGION ' SListarPedidos '}
 function TServicesPedido.SListarPedidos(Req: THorseRequest): TJSONArray;
 var
   LPagina, LSkip, LCodigoUsuario: Integer;
-  LDtValidate: TDtSincVaziaValidation;
+  LDtValidate: IDateEmptyValidation;
   LDtUltSinc: string;
   LPedidos: TJSONArray;
 begin
@@ -72,8 +72,8 @@ begin
 
   // Obter e validar a data de última sincronização
   LDtUltSinc := Req.Query['dt_ult_sincronizacao'];
-  LDtValidate := TDtSincVaziaValidation.Create(LDtUltSinc);
-  try
+  LDtValidate := TDateEmptyValidation.Create(LDtUltSinc);
+  begin
     LDtValidate.Validate;
 
     // Obter os pedidos do repositório
@@ -87,14 +87,25 @@ begin
     end;
 
     Result := LPedidos;
-  finally
-    LDtValidate.Free;
+
   end;
 end;
 
+{$ENDREGION}
+
 function TServicesPedido.SInserirEditarPedidos(Req: THorseRequest): TJSONObject;
+var
+ LCodigoUsuario : Integer;
+ LPedidoData : TJSONObject;
 begin
-  // Implementar lógica de inserção/edição de pedidos
+  // Obter o código do usuário
+  LCodigoUsuario := Controller.Auth.Get_Usuario_Request(Req);
+  // Alimentar Records do Pedido passando a Request
+  FPedidoRepository.ExtractPedidoData(Req.Body<TJSONObject>);
+  // Inserir os pedidos no repositório
+  LPedidoData := FPedidoRepository.InserirPedido(LCodigoUsuario);
+
+  Result := LPedidoData;
 end;
 
 end.

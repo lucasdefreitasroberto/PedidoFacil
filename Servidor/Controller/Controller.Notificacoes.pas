@@ -47,8 +47,7 @@ end;
 procedure RegistrarRotas;
 begin
   THorse.AddCallback(HorseJWT(Controller.Auth.SECRET, THorseJWTConfig.New.SessionClass(TMyClaims)))
-  .Get('/notificacoes',
-  CListarNotificacoes);
+  .Get('/notificacoes', CListarNotificacoes);
 end;
 {$ENDREGION}
 

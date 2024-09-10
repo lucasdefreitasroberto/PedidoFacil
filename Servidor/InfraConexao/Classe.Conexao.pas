@@ -95,7 +95,8 @@ end;
 
 function TQueryFD.ToBlobStream(aParams: string): TStream;
 begin
-  Result := FDQuery.CreateBlobStream(FDQuery.FieldByName(aParams), TBlobStreamMode.bmRead);
+  Result := FDQuery.CreateBlobStream(FDQuery.FieldByName(aParams),
+    TBlobStreamMode.bmRead);
 end;
 
 function TQueryFD.ToJSONArray: TJSONArray;
@@ -103,7 +104,7 @@ begin
   Result := FDQuery.ToJSONArray;
 end;
 
-                                                  function TQueryFD.ToJSONObject: TJSONObject;
+function TQueryFD.ToJSONObject: TJSONObject;
 begin
   Result := FDQuery.ToJSONObject;
 end;
@@ -159,4 +160,3 @@ begin
 end;
 
 end.
-

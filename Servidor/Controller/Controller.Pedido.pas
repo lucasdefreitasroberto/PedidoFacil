@@ -41,7 +41,7 @@ end;
 
 procedure CInserirEditarPedidos(Req: THorseRequest; Res: THorseResponse);
 var
-  RequestHandler: IRequestHandler<TJSONObject>;  // Uso da interface com TJSONArray
+  RequestHandler: IRequestHandler<TJSONObject>;
   ServicesPedido: IServicesPedido;
 begin
   ServicesPedido := TServicesPedido.Create;
@@ -52,7 +52,7 @@ begin
       Result := ServicesPedido.SInserirEditarPedidos(Req);
     end);
 
-  RequestHandler.HandleRequestAndRespond(Req, Res);  // Usa o novo método diretamente
+  RequestHandler.HandleRequestAndRespond(Req, Res);
 end;
 
 procedure RegistrarRotas;
