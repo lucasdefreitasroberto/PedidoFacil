@@ -79,7 +79,7 @@ begin
     LClaims := Req.Session<TMyClaims>;  // Obtém as claims da sessão (se houver uma)
     if Assigned(LClaims) then  // Verifica se as claims estão presentes
       Result := LClaims.COD_USUARIO  // Retorna o código do usuário
-      //LClaims.FJSON.ToJSONi
+      //LClaims.FJSON.ToJSON
 
     else
       raise Exception.Create('Sessão inválida ou expirada.');  // Levanta exceção se a sessão não for válida

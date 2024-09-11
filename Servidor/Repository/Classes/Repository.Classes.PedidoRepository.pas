@@ -12,12 +12,12 @@ type
   TPedidoRepository = class(TInterfacedObject, IPedidoRepository)
   private
     FQuery: TQueryFD;
-    function ReturnSQLInsertUpdate(const PedidoData : RPedidoData): string;
+    function ReturnSQLInsertUpdate(CodigoPedido : integer): string;
   public
     function ListarPedidos(const QuantidadePagina: integer; LSkip, LCodigoUsuario : Integer; LDtUltSinc: string): TJSONArray;
     function ListarItensPedido(CodigoPedido: Integer): TJSONArray;
     function ExtractPedidoData(const APedido: TJSONObject): RPedidoData;
-    function InserirPedido(CodigoPedido: Integer): TJSONObject;
+    function InserirPedido(CodigoUsuario: Integer): TJSONObject;
   end;
 
 implementation
@@ -60,6 +60,7 @@ begin
 end;
 {$ENDREGION}
 
+{$REGION ' ExtractPedidoData '}
 function TPedidoRepository.ExtractPedidoData(const APedido: TJSONObject): RPedidoData;
 begin
   Result.CodPedido        :=   APedido.GetValue<Integer>('COD_PEDIDO', 0);
@@ -76,28 +77,30 @@ begin
   Result.CodPedidoLocal   :=   APedido.GetValue<Integer>('COD_PEDIDO_LOCAL', 0);
   Result.DataUltAlteracao :=   APedido.GetValue<string>('DATA_ULT_ALTERACAO', '');
 end;
+{$ENDREGION}
 
-function TPedidoRepository.ReturnSQLInsertUpdate(const PedidoData : RPedidoData): string;
-var
-  SQLInserirOrEditar: string;
+{$REGION ' ReturnSQLInsertUpdate '}
+function TPedidoRepository.ReturnSQLInsertUpdate(CodigoPedido : integer): string;
 begin
-  if PedidoData.CodPedido = 0 then
-    SQLInserirOrEditar := SQL.Pedido.sqlInserirPedido
+  if CodigoPedido = 0 then
+    Result := SQL.Pedido.sqlInserirPedido
   else
-    SQLInserirOrEditar := SQL.Pedido.sqlUpdatePedido;
+    Result := SQL.Pedido.sqlUpdatePedido;
 end;
+{$ENDREGION}
 
-function TPedidoRepository.InserirPedido(CodigoPedido: Integer): TJSONObject;
+{$REGION ' InserirPedido(CodigoPedido: Integer) '}
+function TPedidoRepository.InserirPedido(CodigoUsuario: Integer): TJSONObject;
 var
   LPedidoData : RPedidoData;
 begin
   FQuery := TQueryFD.Create;
   try
     Result := FQuery
-                .SQL(ReturnSQLInsertUpdate(LPedidoData))
-                .Params('COD_PEDIDO',         CodigoPedido)
+                .SQL(ReturnSQLInsertUpdate(LPedidoData.CodPedido))
+                .Params('COD_PEDIDO',         LPedidoData.CodPedido)
                 .Params('COD_CLIENTE',        LPedidoData.CodCliente)
-                .Params('COD_USUARIO',        LPedidoData.CodUsuario)
+                .Params('COD_USUARIO',        CodigoUsuario)
                 .Params('TIPO_PEDIDO',        LPedidoData.TipoPedido)
                 .Params('DATA_PEDIDO',        LPedidoData.DataPedido)
                 .Params('VALOR_TOTAL',        LPedidoData.ValorTotal)
@@ -109,11 +112,13 @@ begin
                 .Params('CONTATO',            LPedidoData.Contato)
                 .Params('OBS',                LPedidoData.OBS)
                 .Open
-                .ToJSONObject;
+                .ToJSONObject
+                .AddPair('COD_PEDIDO_LOCAL', TJSONNumber.Create(LPedidoData.CodPedidoLocal));;
   finally
     FQuery.Free;
   end;
 end;
+{$ENDREGION}
 
 end.
 

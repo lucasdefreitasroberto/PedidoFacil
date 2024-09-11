@@ -57,9 +57,13 @@ end;
 
 procedure RegistrarRotas;
 begin
-  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET, THorseJWTConfig.New.SessionClass(TMyClaims)))
-    .Get('/pedidos/sincronizacao', CListarPedidos)
-    .Post('/pedidos/sincronizacao', CInserirEditarPedidos);
+  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET,
+    THorseJWTConfig.New.SessionClass(TMyClaims))).Get('/pedidos/sincronizacao',
+    CListarPedidos);
+
+  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET,
+    THorseJWTConfig.New.SessionClass(TMyClaims))).Post('/pedidos/sincronizacao',
+    CInserirEditarPedidos);
 end;
 
 end.
