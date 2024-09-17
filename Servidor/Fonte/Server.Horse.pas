@@ -13,6 +13,7 @@ uses
   Controller.Cliente,
   Controller.Produto,
   Controller.Pedido,
+  Controller.CondPagto,
   System.SysUtils,
   Horse.Upload;
 
@@ -49,6 +50,7 @@ begin
   Controller.Cliente.RegistrarRotas;
   Controller.Produto.RegistrarRotas;
   Controller.Pedido.RegistrarRotas;
+  Controller.CondPagto.RegistrarRotas;
 end;
 {$ENDREGION}
 

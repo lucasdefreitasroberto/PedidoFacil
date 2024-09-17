@@ -19,9 +19,10 @@ procedure RegistrarRotas;
 
 implementation
 
+{$REGION ' CListarPedidos '}
 procedure CListarPedidos(Req: THorseRequest; Res: THorseResponse);
 var
-  RequestHandler: IRequestHandler<TJSONArray>;  // Uso da interface com TJSONArray
+  RequestHandler: IRequestHandler<TJSONArray>;
   ServicesPedido: IServicesPedido;
 begin
   ServicesPedido := TServicesPedido.Create;
@@ -32,13 +33,11 @@ begin
       Result := ServicesPedido.SListarPedidos(Req);
     end);
 
-  // Usa o método da interface para lidar com a requisição e resposta
   RequestHandler.HandleRequestAndRespond(Req, Res);
-
-// Desta forma ele implementa a classe direto e o Delphi não faz a gerenciamento de memorio automatico
-// RequestHandler := TRequestHandler<TJSONArray>.Create(TServicesPedido.Create.SListarPedidos);
 end;
+{$ENDREGION}
 
+{$REGION ' CInserirEditarPedidos '}
 procedure CInserirEditarPedidos(Req: THorseRequest; Res: THorseResponse);
 var
   RequestHandler: IRequestHandler<TJSONObject>;
@@ -54,7 +53,9 @@ begin
 
   RequestHandler.HandleRequestAndRespond(Req, Res);
 end;
+{$ENDREGION}
 
+{$REGION ' RegistrarRotas '}
 procedure RegistrarRotas;
 begin
   THorse.AddCallback(HorseJWT(Controller.Auth.SECRET,
@@ -65,5 +66,6 @@ begin
     THorseJWTConfig.New.SessionClass(TMyClaims))).Post('/pedidos/sincronizacao',
     CInserirEditarPedidos);
 end;
+{$ENDREGION}
 
 end.

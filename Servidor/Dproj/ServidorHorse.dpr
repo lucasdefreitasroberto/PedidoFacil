@@ -4,7 +4,7 @@ uses
   System.StartUpCopy,
   FMX.Forms,
   UnitPrincipal in '..\fonte\UnitPrincipal.pas' {frmPrincipal},
-  Controller.Usuario in '..\controller\Controller.Usuario.pas',
+  Controller.Usuario in '..\controller\Controller.Usuario.pas' {DM.Conexao in '..\DataModule\DM.Conexao.pas' {DMConexao: TDataModule},
   DM.Conexao in '..\DataModule\DM.Conexao.pas' {DMConexao: TDataModule},
   Utilitarios in '..\Utils\Utilitarios.pas',
   Services.Usuario in '..\Services\Services.Usuario.pas',
@@ -30,13 +30,20 @@ uses
   Interfaces.Handler in '..\Handler\Interfaces.Handler.pas',
   Classes.Handler in '..\Handler\Classes.Handler.pas',
   Repository.Interfaces.IPedidoRepository in '..\Repository\Interfaces\Repository.Interfaces.IPedidoRepository.pas',
-  Repository.Classes.PedidoRepository in '..\Repository\Classes\Repository.Classes.PedidoRepository.pas';
+  Repository.Classes.PedidoRepository in '..\Repository\Classes\Repository.Classes.PedidoRepository.pas',
+  Controller.CondPagto in '..\Controller\Controller.CondPagto.pas',
+  Services.CondPagto in '..\Services\Services.CondPagto.pas',
+  Repository.Interfaces.ICondPagtoRepository in '..\Repository\Interfaces\Repository.Interfaces.ICondPagtoRepository.pas',
+  Repository.Classes.CondPagtoRepository in '..\Repository\Classes\Repository.Classes.CondPagtoRepository.pas',
+  SQL.CondPagto in '..\SQL\SQL.CondPagto.pas';
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.CreateForm(TfrmPrincipal, frmPrincipal);
-   ReportMemoryLeaksOnShutdown := True;
+  {$IFDEF DEBUG}
+    ReportMemoryLeaksOnShutdown := True;
+  {$ENDIF}
   Application.Run;
 end.

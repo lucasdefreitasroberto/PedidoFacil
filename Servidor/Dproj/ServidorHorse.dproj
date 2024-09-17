@@ -294,6 +294,11 @@
         <DCCReference Include="..\Handler\Classes.Handler.pas"/>
         <DCCReference Include="..\Repository\Interfaces\Repository.Interfaces.IPedidoRepository.pas"/>
         <DCCReference Include="..\Repository\Classes\Repository.Classes.PedidoRepository.pas"/>
+        <DCCReference Include="..\Controller\Controller.CondPagto.pas"/>
+        <DCCReference Include="..\Services\Services.CondPagto.pas"/>
+        <DCCReference Include="..\Repository\Interfaces\Repository.Interfaces.ICondPagtoRepository.pas"/>
+        <DCCReference Include="..\Repository\Classes\Repository.Classes.CondPagtoRepository.pas"/>
+        <DCCReference Include="..\SQL\SQL.CondPagto.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

@@ -33,7 +33,8 @@
 					"query": [
 						{
 							"key": "dt_ult_sincronizacao",
-							"value": "2024-01-01 08:00:00"
+							"value": "2024-01-01 08:00:00",
+							"description": "Data do meu aplicado, data menor[Mostra que meu app está desatualizado]"
 						},
 						{
 							"key": "pagina",
@@ -61,7 +62,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"COD_CLIENTE_LOCAL\": 123,        \r\n    \"CNPJ_CPF\":\"00.000.000/0000-00\",           \r\n    \"NOME\":\"Cliente Teste Sincronizacao\",           \r\n    \"FONE\":\"(11) 0000-0000\",          \r\n    \"EMAIL\":\"contato@teste.com\",        \r\n    \"ENDERECO\":\"Av. Brasil\",     \r\n    \"NUMERO\":\"1500\",      \r\n    \"COMPLEMENTO\":\"\",  \r\n    \"BAIRRO\":\"Centro\",       \r\n    \"CIDADE\":\"Ubá\",   \r\n    \"UF\":\"MG\",      \r\n    \"CEP\":\"36507122\",     \r\n    \"LATITUDE\": 0, \r\n    \"LONGITUDE\": 0,\r\n    \"LIMITE_DISPONIVEL\":1000,  \r\n    \"DATA_ULT_ALTERACAO\":\"2023-01-01 08:00:00\",\r\n    \"COD_CLIENTE_OFICIAL\": 0    \r\n}",
+					"raw": "{\r\n    \"COD_CLIENTE_LOCAL\": 123,        \r\n    \"NOME\":\"Cliente Teste Sincronizacao\",           \r\n    \"CNPJ_CPF\":\"00.000.000/0000-00\",           \r\n    \"FONE\":\"(32) 0000-0000\",          \r\n    \"EMAIL\":\"contato@teste.com\",        \r\n    \"ENDERECO\":\"Av. Brasil\",     \r\n    \"NUMERO\":\"1500\",      \r\n    \"COMPLEMENTO\":\"\",  \r\n    \"BAIRRO\":\"Centro\",       \r\n    \"CIDADE\":\"Ubá\",   \r\n    \"UF\":\"MG\",      \r\n    \"CEP\":\"36507122\",     \r\n    \"LATITUDE\": 0, \r\n    \"LONGITUDE\": 0,\r\n    \"LIMITE_DISPONIVEL\":1000,  \r\n    \"DATA_ULT_SINCRONIZACAO\":\"2023-01-01 08:00:00\",\r\n    \"COD_CLIENTE_OFICIAL\": 0   \r\n}",
 					"options": {
 						"raw": {
 							"language": "json"

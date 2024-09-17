@@ -8,47 +8,6 @@
 	},
 	"item": [
 		{
-			"name": "usuarios - CADASTRAR USUARIO",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"nome\": \"Lucas De Freitas Roberto\",\r\n    \"email\": \"lucasfreitas23.t.2@hotmail.com\",\r\n    \"senha\": \"1234567\"\r\n\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{9000}}/usuarios",
-					"host": [
-						"{{9000}}"
-					],
-					"path": [
-						"usuarios"
-					]
-				},
-				"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
-			},
-			"response": []
-		},
-		{
 			"name": "usuarios/login - LOGIN USUARIO",
 			"event": [
 				{
@@ -91,6 +50,47 @@
 			"response": []
 		},
 		{
+			"name": "usuarios - CADASTRAR USUARIO",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"Lucas De Freitas Roberto\",\r\n    \"email\": \"lucasfreitas.t.2@hotmail.com\",\r\n    \"senha\": \"123456\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{9000}}/usuarios",
+					"host": [
+						"{{9000}}"
+					],
+					"path": [
+						"usuarios"
+					]
+				},
+				"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+			},
+			"response": []
+		},
+		{
 			"name": "usuarios/push EDITAR TOKEN-PUSH",
 			"event": [
 				{
@@ -112,7 +112,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MjB9.pK669MICXTYJgPoojYhkN2mHu_WDzVhpJZhwQi7JTIY",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MX0.JfEQnIbSRmTu-bU3Qj_Cfdob9s79tyx_QsPKymta814",
 							"type": "string"
 						}
 					]
@@ -121,7 +121,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"token_push\": \"1010101010\"\r\n}",
+					"raw": "{\r\n    \"token_push\": \"9999999999999999999\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -227,7 +227,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \r\n  \"nome\": \"Lucas De Freitas Roberto\",\r\n  \"email\": \"lucasfreitas.t.2@hotmail.com\"\r\n}",
+					"raw": "",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -270,7 +270,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MjB9.pK669MICXTYJgPoojYhkN2mHu_WDzVhpJZhwQi7JTIY",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MX0.JfEQnIbSRmTu-bU3Qj_Cfdob9s79tyx_QsPKymta814",
 							"type": "string"
 						}
 					]
@@ -279,7 +279,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \r\n  \"senha\": \"123456\"\r\n}",
+					"raw": "{ \r\n  \"senha\": \"teste\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"

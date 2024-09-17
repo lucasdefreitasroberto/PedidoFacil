@@ -1,0 +1,190 @@
+{
+	"info": {
+		"_postman_id": "e2cd6a78-f3e3-4afe-a46d-ff98f7a2073d",
+		"name": "Servidor PedidoFacil - PRODUTOS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26696873"
+	},
+	"item": [
+		{
+			"name": "LISTAR PRODUTO  QUE TEVE ALTERAÇÕES DOS DADOS PARA SINCRONIZAR",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MjB9.pK669MICXTYJgPoojYhkN2mHu_WDzVhpJZhwQi7JTIY",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{9000}}/produtos/sincronizacao?dt_ult_sincronizacao=2023-01-01 08:00:00&pagina=1",
+					"host": [
+						"{{9000}}"
+					],
+					"path": [
+						"produtos",
+						"sincronizacao"
+					],
+					"query": [
+						{
+							"key": "dt_ult_sincronizacao",
+							"value": "2023-01-01 08:00:00",
+							"description": "Data do meu aplicado, data menor[Mostra que meu app está desatualizado]"
+						},
+						{
+							"key": "pagina",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "INSERIR OU ATUALIZAR PRODUTO QUE TEVE ALTERAÇÕES DOS DADOS PARA SINCRONIZAR",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MjB9.pK669MICXTYJgPoojYhkN2mHu_WDzVhpJZhwQi7JTIY",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"COD_PRODUTO_LOCAL\" : 123,\r\n    \"DESCRICAO\" : \"Lanterna Pescador 12 Led\",\r\n    \"VALOR\" : 299,\r\n    \"QTD_ESTOQUE\" : 10,\r\n    \"DATA_ULT_ALTERACAO\":\"2024-01-01 08:00:00\",\r\n    \"COD_PRODUTO_OFICIAL\" : 21\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{9000}}/produtos/sincronizacao",
+					"host": [
+						"{{9000}}"
+					],
+					"path": [
+						"produtos",
+						"sincronizacao"
+					],
+					"query": [
+						{
+							"key": "dt_ult_sincronizacao",
+							"value": "2024-01-01 08:00:00",
+							"disabled": true
+						},
+						{
+							"key": "pagina",
+							"value": "1",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "LISTAR FOTO PRODUTO",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MjB9.pK669MICXTYJgPoojYhkN2mHu_WDzVhpJZhwQi7JTIY",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{9000}}/produtos/foto/1",
+					"host": [
+						"{{9000}}"
+					],
+					"path": [
+						"produtos",
+						"foto",
+						"1"
+					],
+					"query": [
+						{
+							"key": "dt_ult_sincronizacao",
+							"value": "2024-01-01 08:00:00",
+							"disabled": true
+						},
+						{
+							"key": "pagina",
+							"value": "1",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "EDITAR FOTO PRODUTO",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MjB9.pK669MICXTYJgPoojYhkN2mHu_WDzVhpJZhwQi7JTIY",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "files",
+							"type": "file",
+							"src": "/C:/Users/HAHA/Pictures/Icones/delphi.png"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{9000}}/produtos/foto/3",
+					"host": [
+						"{{9000}}"
+					],
+					"path": [
+						"produtos",
+						"foto",
+						"3"
+					],
+					"query": [
+						{
+							"key": "dt_ult_sincronizacao",
+							"value": "2024-01-01 08:00:00",
+							"disabled": true
+						},
+						{
+							"key": "pagina",
+							"value": "1",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

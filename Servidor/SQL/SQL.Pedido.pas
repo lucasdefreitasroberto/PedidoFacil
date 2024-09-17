@@ -4,8 +4,9 @@ interface
 
 function sqlListarPedidos: string;
 function sqlListarItensPedido: string;
-function sqlInserirPedido: string;
-function sqlUpdatePedido: string;
+function sqlInsertOrUpdatePedido: string;
+function sqlDeleteItensPedido: string;
+function sqlInsertItensPedido: string;
 
 implementation
 
@@ -50,37 +51,34 @@ begin
 end;
 {$ENDREGION}
 
-{$REGION ' sqlInserirPedido '}
-function sqlInserirPedido: string;
+{$REGION ' sqlInsertOrUpdate '}
+function sqlInsertOrUpdatePedido: string;
 begin
   Result :=
-  ' insert into PEDIDO (COD_PEDIDO, COD_CLIENTE, COD_USUARIO, TIPO_PEDIDO, DATA_PEDIDO, CONTATO, OBS, VALOR_TOTAL, '+
+  ' update or insert into PEDIDO (COD_PEDIDO, COD_CLIENTE, COD_USUARIO, TIPO_PEDIDO, DATA_PEDIDO, CONTATO, OBS, VALOR_TOTAL, '+
   ' COD_COND_PAGTO, PRAZO_ENTREGA, DATA_ENTREGA, COD_PEDIDO_LOCAL, DATA_ULT_ALTERACAO) '+
   ' values (:COD_PEDIDO, :COD_CLIENTE, :COD_USUARIO, :TIPO_PEDIDO, :DATA_PEDIDO, :CONTATO, :OBS, :VALOR_TOTAL, '+
   ' :COD_COND_PAGTO, :PRAZO_ENTREGA, :DATA_ENTREGA, :COD_PEDIDO_LOCAL, :DATA_ULT_ALTERACAO) '+
+  ' matching (COD_PEDIDO) '+
   ' returning COD_PEDIDO ';
 end;
 {$ENDREGION}
 
-{$REGION ' sqlUpdatePedido '}
-function sqlUpdatePedido: string;
+{$REGION ' sqlDeleteItensPedido '}
+function sqlDeleteItensPedido: string;
 begin
   Result :=
-  ' update PEDIDO '+
-  ' set COD_CLIENTE = :COD_CLIENTE, '+
-  ' COD_USUARIO = :COD_USUARIO, '+
-  ' TIPO_PEDIDO = :TIPO_PEDIDO, '+
-  ' DATA_PEDIDO = :DATA_PEDIDO, '+
-  ' CONTATO = :CONTATO, '+
-  ' OBS = :OBS, '+
-  ' VALOR_TOTAL = :VALOR_TOTAL, '+
-  ' COD_COND_PAGTO = :COD_COND_PAGTO, '+
-  ' PRAZO_ENTREGA = :PRAZO_ENTREGA, '+
-  ' DATA_ENTREGA = :DATA_ENTREGA, '+
-  ' COD_PEDIDO_LOCAL = :COD_PEDIDO_LOCAL, '+
-  ' DATA_ULT_ALTERACAO = :DATA_ULT_ALTERACAO '+
-  ' where (COD_PEDIDO = :COD_PEDIDO) '+
-  '  returning COD_PEDIDO ';
+  ' delete from PEDIDO_ITEM '+
+  ' where (COD_PEDIDO = :COD_PEDIDO) ';
+end;
+{$ENDREGION}
+
+{$REGION ' sqlInsertItensPedido '}
+function sqlInsertItensPedido: string;
+begin
+  Result :=
+  ' insert into PEDIDO_ITEM (COD_PEDIDO, COD_PRODUTO, QTD, VALOR_UNITARIO, VALOR_TOTAL) '+
+  ' values (:COD_PEDIDO, :COD_PRODUTO, :QTD, :VALOR_UNITARIO, :VALOR_TOTAL) ';
 end;
 {$ENDREGION}
 

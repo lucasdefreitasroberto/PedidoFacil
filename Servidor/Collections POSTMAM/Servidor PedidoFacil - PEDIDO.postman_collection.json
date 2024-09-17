@@ -1,0 +1,95 @@
+{
+	"info": {
+		"_postman_id": "3268010f-7c83-4924-9a13-43778bb7d411",
+		"name": "Servidor PedidoFacil - PEDIDO",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26696873"
+	},
+	"item": [
+		{
+			"name": "LISTAR PEDIDOS",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MjAsImV4cCI6MTcyNjY5NTkzNH0.0Ie0I55BUFO-pOMwXC5-n1FmTpId4YH3nteuJb6Dtpc",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{9000}}/pedidos/sincronizacao?dt_ult_sincronizacao=2024-01-01 08:00:00&pagina=2",
+					"host": [
+						"{{9000}}"
+					],
+					"path": [
+						"pedidos",
+						"sincronizacao"
+					],
+					"query": [
+						{
+							"key": "dt_ult_sincronizacao",
+							"value": "2024-01-01 08:00:00"
+						},
+						{
+							"key": "pagina",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "INSERIR PEDIDOS",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MjAsImV4cCI6MTcyNjY5NTkzNH0.0Ie0I55BUFO-pOMwXC5-n1FmTpId4YH3nteuJb6Dtpc",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"COD_PEDIDO\": 0,\r\n    \"COD_CLIENTE\": 1,\r\n    \"COD_USUARIO\": 20,  \r\n    \"TIPO_PEDIDO\": \"P\",\r\n    \"DATA_PEDIDO\": \"2023-01-01 08:00:00\",\r\n    \"VALOR_TOTAL\": 0,\r\n    \"COD_COND_PAGTO\": 0,\r\n    \"CONTATO\": \"aaa\",\r\n    \"OBS\": \"aaa\",       \r\n    \"PRAZO_ENTREGA\": \"8\",\r\n    \"DATA_ENTREGA\": \"2023-01-01 08:00:00\",\r\n    \"COD_PEDIDO_LOCAL\": 1,\r\n    \"DATA_ULT_ALTERACAO\": \"2023-01-01 08:00:00\",\r\n    \"ITENS\": [{\r\n        \"COD_PRODUTO\": 1,\r\n        \"QTD\": 2,\r\n        \"VALOR_UNITARIO\": 225,\r\n        \"VALOR_TOTAL\": 500 \r\n    },{\r\n        \"COD_PRODUTO\": 2,\r\n        \"QTD\": 1,\r\n        \"VALOR_UNITARIO\": 500,\r\n        \"VALOR_TOTAL\": 500 \r\n    }]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{9000}}/pedidos/sincronizacao?dt_ult_sincronizacao=2024-01-01 08:00:00&pagina=1",
+					"host": [
+						"{{9000}}"
+					],
+					"path": [
+						"pedidos",
+						"sincronizacao"
+					],
+					"query": [
+						{
+							"key": "dt_ult_sincronizacao",
+							"value": "2024-01-01 08:00:00"
+						},
+						{
+							"key": "pagina",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
