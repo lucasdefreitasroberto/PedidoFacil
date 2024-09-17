@@ -1,0 +1,49 @@
+{
+	"info": {
+		"_postman_id": "3f949800-daae-410a-9f93-e3bf1e62d3a0",
+		"name": "Servidor PedidoFacil - COND PAGTO",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26696873"
+	},
+	"item": [
+		{
+			"name": "LISTAR COND PAGAMENTO",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MjB9.pK669MICXTYJgPoojYhkN2mHu_WDzVhpJZhwQi7JTIY",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{9000}}/produtos/sincronizacao?dt_ult_sincronizacao=2023-01-01 08:00:00&pagina=1",
+					"host": [
+						"{{9000}}"
+					],
+					"path": [
+						"produtos",
+						"sincronizacao"
+					],
+					"query": [
+						{
+							"key": "dt_ult_sincronizacao",
+							"value": "2023-01-01 08:00:00",
+							"description": "Data do meu aplicado, data menor[Mostra que meu app está desatualizado]"
+						},
+						{
+							"key": "pagina",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
