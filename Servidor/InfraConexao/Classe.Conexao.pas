@@ -41,6 +41,7 @@ type
     function ToBlobStream(aParams: string): TStream;
     function ToStream: TStream;
     procedure Free;
+    Class function New(): iQuery;
   end;
 
 implementation
@@ -68,6 +69,11 @@ procedure TQueryFD.Free;
 begin
   FreeAndNil(FDBaseConexao);
   FreeAndNil(FDQuery);
+end;
+
+class function TQueryFD.New: iQuery;
+begin
+  Result := TQueryFD.Create;
 end;
 
 function TQueryFD.Commit: iQuery;

@@ -13,8 +13,6 @@ uses
 
 type
   TPedidoRepository = class(TInterfacedObject, IPedidoRepository)
-  private
-    FQuery: TQueryFD;
   public
     function ListarPedidos(const QuantidadePagina: integer; LSkip, LCodigoUsuario : Integer; LDtUltSinc: string): TJSONArray;
     function ListarItensPedido(CodigoPedido: Integer): TJSONArray;
@@ -30,35 +28,27 @@ uses
 {$REGION ' ListarPedidos '}
 function TPedidoRepository.ListarPedidos(const QuantidadePagina: integer; LSkip, LCodigoUsuario : Integer; LDtUltSinc: string): TJSONArray;
 begin
-  FQuery := TQueryFD.Create;
-  try
-    Result := FQuery
-               .SQL(SQL.Pedido.sqlListarPedidos)
-               .Params('FIRST', QuantidadePagina)
-               .Params('SKIP', LSkip)
-               .Params('DATA_ULT_ALTERACAO', LDtUltSinc)
-               .Params('COD_USUARIO', LCodigoUsuario)
-               .Open
-               .ToJSONArray;
-  finally
-    FQuery.Free;
-  end;
+  Result :=
+   TQueryFD.New
+    .SQL(SQL.Pedido.sqlListarPedidos)
+    .Params('FIRST', QuantidadePagina)
+    .Params('SKIP', LSkip)
+    .Params('DATA_ULT_ALTERACAO', LDtUltSinc)
+    .Params('COD_USUARIO', LCodigoUsuario)
+    .Open
+    .ToJSONArray;
 end;
 {$ENDREGION}
 
 {$REGION ' ListarItensPedido '}
 function TPedidoRepository.ListarItensPedido(CodigoPedido: Integer): TJSONArray;
 begin
-  FQuery := TQueryFD.Create;
-  try
-    Result := FQuery
-                .SQL(SQL.Pedido.sqlListarItensPedido)
-                .Params('COD_PEDIDO', CodigoPedido)
-                .Open
-                .ToJSONArray;
-  finally
-    FQuery.Free;
-  end;
+  Result :=
+   TQueryFD.New
+    .SQL(SQL.Pedido.sqlListarItensPedido)
+    .Params('COD_PEDIDO', CodigoPedido)
+    .Open
+    .ToJSONArray;
 end;
 {$ENDREGION}
 
@@ -100,48 +90,42 @@ begin
     LValidateItens.Validate;
   end;
 
-  FQuery := TQueryFD.Create;
-  try
-    Result :=
-    FQuery
-      .SQL(SQL.Pedido.sqlInsertOrUpdatePedido)
-      .Params('COD_PEDIDO',         PedidoData.CodPedido)
-      .Params('COD_CLIENTE',        PedidoData.CodCliente)
-      .Params('COD_USUARIO',        CodigoUsuario)
-      .Params('TIPO_PEDIDO',        PedidoData.TipoPedido)
-      .Params('DATA_PEDIDO',        StrToNullDateTime(PedidoData.DataPedido))
-      .Params('VALOR_TOTAL',        PedidoData.ValorTotal)
-      .Params('COD_COND_PAGTO',     PedidoData.CodCondPagto)
-      .Params('PRAZO_ENTREGA',      PedidoData.PrazoEntrega)
-      .Params('DATA_ENTREGA',       StrToNullDateTime(PedidoData.DataEntrega))
-      .Params('COD_PEDIDO_LOCAL',   PedidoData.CodPedidoLocal)
-      .Params('DATA_ULT_ALTERACAO', StrToNullDateTime(PedidoData.DataUltAlteracao))
-      .Params('CONTATO',            PedidoData.Contato)
-      .Params('OBS',                PedidoData.OBS)
-      .Open
-      .ToJSONObject
-      .AddPair('cod_pedido_local', TJSONNumber.Create(PedidoData.CodPedidoLocal));
+  Result :=
+   TQueryFD.New
+    .SQL(SQL.Pedido.sqlInsertOrUpdatePedido)
+    .Params('COD_PEDIDO',         PedidoData.CodPedido)
+    .Params('COD_CLIENTE',        PedidoData.CodCliente)
+    .Params('COD_USUARIO',        CodigoUsuario)
+    .Params('TIPO_PEDIDO',        PedidoData.TipoPedido)
+    .Params('DATA_PEDIDO',        StrToNullDateTime(PedidoData.DataPedido))
+    .Params('VALOR_TOTAL',        PedidoData.ValorTotal)
+    .Params('COD_COND_PAGTO',     PedidoData.CodCondPagto)
+    .Params('PRAZO_ENTREGA',      PedidoData.PrazoEntrega)
+    .Params('DATA_ENTREGA',       StrToNullDateTime(PedidoData.DataEntrega))
+    .Params('COD_PEDIDO_LOCAL',   PedidoData.CodPedidoLocal)
+    .Params('DATA_ULT_ALTERACAO', StrToNullDateTime(PedidoData.DataUltAlteracao))
+    .Params('CONTATO',            PedidoData.Contato)
+    .Params('OBS',                PedidoData.OBS)
+    .Open
+    .ToJSONObject
+    .AddPair('cod_pedido_local', TJSONNumber.Create(PedidoData.CodPedidoLocal));
 
-    FQuery
-      .SQL(SQL.Pedido.sqlDeleteItensPedido)
-      .Params('COD_PEDIDO', PedidoData.CodPedido)
-      .ExecSQL;
+   TQueryFD.New
+    .SQL(SQL.Pedido.sqlDeleteItensPedido)
+    .Params('COD_PEDIDO', PedidoData.CodPedido)
+    .ExecSQL;
 
-    for var I := 0 to itens.Count - 1 do
-    begin
-      FQuery
-        .SQL(SQL.Pedido.sqlInsertItensPedido)
-        .Params('COD_PEDIDO',     Result.GetValue<integer>(LowerCase('COD_PEDIDO')))
-        .Params('COD_PRODUTO',    itens[I].GetValue<integer>('COD_PRODUTO', 0))
-        .Params('QTD',            itens[I].GetValue<Double>('QTD',0))
-        .Params('VALOR_UNITARIO', itens[I].GetValue<Double>('VALOR_UNITARIO',0))
-        .Params('VALOR_TOTAL',    itens[I].GetValue<Double>('VALOR_TOTAL',0))
-        .ExecSQL;
-    end;
-
-  finally
-    FQuery.Free;
-  end;
+   for var I := 0 to itens.Count - 1 do
+   begin
+    TQueryFD.New
+     .SQL(SQL.Pedido.sqlInsertItensPedido)
+     .Params('COD_PEDIDO',     Result.GetValue<integer>(LowerCase('COD_PEDIDO')))
+     .Params('COD_PRODUTO',    itens[I].GetValue<integer>('COD_PRODUTO', 0))
+     .Params('QTD',            itens[I].GetValue<Double>('QTD',0))
+     .Params('VALOR_UNITARIO', itens[I].GetValue<Double>('VALOR_UNITARIO',0))
+     .Params('VALOR_TOTAL',    itens[I].GetValue<Double>('VALOR_TOTAL',0))
+     .ExecSQL;
+   end;
 end;
 {$ENDREGION}
 

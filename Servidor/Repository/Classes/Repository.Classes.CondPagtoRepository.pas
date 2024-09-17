@@ -7,14 +7,13 @@ uses
   System.JSON,
   FireDAC.Comp.Client,
   Classe.Conexao,
+  Interfaces.Conexao,
   System.SysUtils,
   System.Variants,
   SQL.CondPagto;
 
 type
   TCondPagtoRepository = class(TInterfacedObject, ICondPagtoRepository)
-    private
-    FQuery: TQueryFD;
   public
     function ListarCondPagto: TJSONArray;
   end;
@@ -26,16 +25,12 @@ implementation
 {$REGION ' ListarCondPagto '}
 function TCondPagtoRepository.ListarCondPagto: TJSONArray;
 begin
-  FQuery := TQueryFD.Create;
-  try
-    Result :=
-      FQuery
-      .SQL(SQL.CondPagto.sqlListarCondPagto)
-      .Open
-      .ToJSONArray;
-  finally
-    FQuery.Free;
-  end;
+  Result :=
+    TQueryFD
+    .New
+    .SQL(SQL.CondPagto.sqlListarCondPagto)
+    .Open
+    .ToJSONArray;
 end;
 {$ENDREGION}
 
