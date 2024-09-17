@@ -15,7 +15,7 @@
 ### Rotas
 ## **usuarios**
 
-![image](https://github.com/user-attachments/assets/de147957-8c27-4500-bfee-76cbb74f7144)
+![image](https://github.com/user-attachments/assets/19bddcaf-6c01-4415-97ad-813c519b8eb7)
 
 ## **clientes**
 
