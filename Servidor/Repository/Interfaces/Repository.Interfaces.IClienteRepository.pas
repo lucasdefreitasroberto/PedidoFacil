@@ -30,9 +30,9 @@ type
 
   type
   IClienteRepository = interface
-   function RListarClientes(QuantidadePagina, Skip: integer; DataUltSinc: string): TJSONArray;
+   function RListarClientes(const QuantidadePagina, Skip: integer; DataUltSinc: string): TJSONArray;
    function ExtrairClienteData(const ACliente: TJSONObject): RClienteData;
-  // function RInserirCliente(const ACliente: TJSONObject; Req: THorseRequest): TJSONObject;
+   function RInserirCliente(CodigoUsuario: Integer; const ACliente: TJSONObject): TJSONObject;
   end;
 implementation
 

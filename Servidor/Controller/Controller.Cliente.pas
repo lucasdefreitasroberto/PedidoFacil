@@ -31,24 +31,10 @@ end;
 
 {$REGION ' CInserirCliente '}
 procedure CInserirCliente(Req: THorseRequest; Res: THorseResponse; Next: TProc);
-var
-  LService : TServicesCliente;
-  LJsonRetorno : TJSONObject;
 begin
-  LService := TServicesCliente.Create;
-  try
-
-    try
-      LJsonRetorno := LService.SInserirCliente(Req.Body<TJSONObject>, Req);
-      Res.Send<TJSONObject>(LJsonRetorno).Status(THTTPStatus.Created);
-    except
-      on ex: Exception do
-        Res.Send(ex.Message).Status(500);
-    end;
-
-  finally
-    FreeAndNil(LService);
-  end;
+  TRequestHandler<TJSONObject>
+  .New(TServicesCliente.New.SInserirCliente(Req))
+  .HandleRequestAndRespond(Req, Res);
 end;
 {$ENDREGION}
 

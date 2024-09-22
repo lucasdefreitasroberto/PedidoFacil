@@ -23,12 +23,13 @@ type
     class function New(const Data: string): IValidation;
   end;
 
-  TNomeVazioValidation = class(TBaseValidation)
+  TInserirClienteValidation = class(TInterfacedObject, IValidation)
   private
     FNome: string;
   public
     constructor Create(const Nome: string);
-    procedure Validate; override;
+    procedure Validate;
+    class function New(const Nome: string): IValidation;
   end;
 
 implementation
@@ -51,14 +52,19 @@ begin
     raise EHorseException.New.Error('Parâmetro dt_ult_sincronizacao não informado')
 end;
 
-{ TNomeVazioValidation }
+{ TInserirClienteValidation }
 
-constructor TNomeVazioValidation.Create(const Nome: string);
+constructor TInserirClienteValidation.Create(const Nome: string);
 begin
   FNome := Nome;
 end;
 
-procedure TNomeVazioValidation.Validate;
+class function TInserirClienteValidation.New(const Nome: string): IValidation;
+begin
+  Result := Self.Create(Nome);
+end;
+
+procedure TInserirClienteValidation.Validate;
 begin
   if (FNome = EmptyStr) then
     raise EHorseException.New.Error('Nome do cliente precisa ser informado')

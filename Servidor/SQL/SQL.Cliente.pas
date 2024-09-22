@@ -10,7 +10,8 @@ implementation
 function sqlListarClientes: string;
 begin
   Result :=
-   ' select COD_CLIENTE, COD_USUARIO, CNPJ_CPF, '+
+   ' select first :first skip :skip '+
+   '   COD_CLIENTE, COD_USUARIO, CNPJ_CPF, '+
    '   NOME, FONE, EMAIL, ENDERECO, NUMERO, COMPLEMENTO, '+
    '   BAIRRO, CIDADE, UF, CEP, LATITUDE, LONGITUDE, '+
    '   LIMITE_DISPONIVEL, DATA_ULT_ALTERACAO '+
