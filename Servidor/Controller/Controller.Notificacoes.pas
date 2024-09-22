@@ -12,42 +12,45 @@ uses
   Horse.JWT,
   Horse.HandleException,
   Services.Notificacoes,
-  IdSSLOpenSSLHeaders;
+  IdSSLOpenSSLHeaders,
+  Interfaces.Handler,
+  Classes.Handler;
 
 procedure RegistrarRotas;
 
 implementation
 
 {$REGION ' CListarNotificacoes '}
-
 procedure CListarNotificacoes(Req: THorseRequest; Res: THorseResponse; Next: TProc);
-var
-  LService : TServicesNotificacoes;
-  LJsonRetorno : TJSONArray;
+//var
+//  RequestHandler: IRequestHandler<TJSONArray>;
+//  ServicesPedido: IServicesNotificacoes;
 begin
-  LService := TServicesNotificacoes.Create;
-  try
 
-    try
-      LJsonRetorno := LService.SListarNotificacoes(Req);
-      Res.Send<TJSONArray>(LJsonRetorno).Status(THTTPStatus.OK);
-    except
-      on ex: Exception do
-        Res.Send(ex.Message).Status(500);
-    end;
+  {1}
+  // RequestHandler := TRequestHandler<TJSONArray>.Create(
+  // function(Req: THorseRequest): TJSONArray
+  // begin
+  // Result := TServicesNotificacoes.New.SListarNotificacoes(Req);
+  // end);
 
-  finally
-    FreeAndNil(LService);
-  end;
+  {2}
+  // RequestHandler := TRequestHandler<TJSONArray>.New(TServicesNotificacoes.New.SListarNotificacoes(Req));
+  // RequestHandler.HandleRequestAndRespond(Req, Res);
+
+  {3}
+  TRequestHandler<TJSONArray>
+    .New(TServicesNotificacoes.New.SListarNotificacoes(Req))
+    .HandleRequestAndRespond(Req, Res);
 end;
-
 {$ENDREGION}
 
 {$REGION ' Registra Rotas '}
 procedure RegistrarRotas;
 begin
-  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET, THorseJWTConfig.New.SessionClass(TMyClaims)))
-  .Get('/notificacoes', CListarNotificacoes);
+  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET,
+    THorseJWTConfig.New.SessionClass(TMyClaims)))
+    .Get('/notificacoes', CListarNotificacoes);
 end;
 {$ENDREGION}
 

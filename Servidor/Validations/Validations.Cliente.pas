@@ -14,12 +14,13 @@ uses
 
 type
 
-  TDtUltSincVaziaValidation = class(TBaseValidation)
+  TDtUltSincVaziaValidation = class(TInterfacedObject, IValidation)
   private
     FData: string;
   public
     constructor Create(const Data: string);
-    procedure Validate; override;
+    procedure Validate;
+    class function New(const Data: string): IValidation;
   end;
 
   TNomeVazioValidation = class(TBaseValidation)
@@ -37,6 +38,11 @@ implementation
 constructor TDtUltSincVaziaValidation.Create(const Data: string);
 begin
   FData := Data;
+end;
+
+class function TDtUltSincVaziaValidation.New(const Data: string): IValidation;
+begin
+  Result := Self.Create(Data);
 end;
 
 procedure TDtUltSincVaziaValidation.Validate;

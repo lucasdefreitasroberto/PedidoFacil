@@ -12,7 +12,8 @@ uses
   Horse.JWT,
   Horse.HandleException,
   Services.Cliente,
-  IdSSLOpenSSLHeaders;
+  IdSSLOpenSSLHeaders,
+  Classes.Handler;
 
 procedure RegistrarRotas;
 
@@ -21,24 +22,10 @@ implementation
 {$REGION ' CListarClientes '}
 
 procedure CListarClientes(Req: THorseRequest; Res: THorseResponse; Next: TProc);
-var
-  LService : TServicesCliente;
-  LJsonRetorno : TJSONArray;
 begin
-  LService := TServicesCliente.Create;
-  try
-
-    try
-      LJsonRetorno := LService.SListarClientes(Req.Body<TJSONObject>, Req);
-      Res.Send<TJSONArray>(LJsonRetorno).Status(THTTPStatus.OK);
-    except
-      on ex: Exception do
-        Res.Send(ex.Message).Status(500);
-    end;
-
-  finally
-    FreeAndNil(LService);
-  end;
+  TRequestHandler<TJSONArray>
+  .New(TServicesCliente.New.SListarClientes(Req))
+  .HandleRequestAndRespond(Req, Res);
 end;
 {$ENDREGION}
 
@@ -68,13 +55,13 @@ end;
 {$REGION ' RegistrarRotas '}
 procedure RegistrarRotas;
 begin
-  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET, THorseJWTConfig.New.SessionClass(TMyClaims)))
-  .Get('/clientes/sincronizacao',
-  CListarClientes);
+  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET,
+    THorseJWTConfig.New.SessionClass(TMyClaims)))
+    .Get('/clientes/sincronizacao', CListarClientes);
 
-  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET, THorseJWTConfig.New.SessionClass(TMyClaims)))
-  .Post('/clientes/sincronizacao',
-  CInserirCliente);
+  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET,
+    THorseJWTConfig.New.SessionClass(TMyClaims)))
+    .Post('/clientes/sincronizacao', CInserirCliente);
 end;
 {$ENDREGION}
 

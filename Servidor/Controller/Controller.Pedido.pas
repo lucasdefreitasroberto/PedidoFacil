@@ -21,37 +21,19 @@ implementation
 
 {$REGION ' CListarPedidos '}
 procedure CListarPedidos(Req: THorseRequest; Res: THorseResponse);
-var
-  RequestHandler: IRequestHandler<TJSONArray>;
-  ServicesPedido: IServicesPedido;
 begin
-  ServicesPedido := TServicesPedido.Create;
-
-  RequestHandler := TRequestHandler<TJSONArray>.Create(
-    function(Req: THorseRequest): TJSONArray
-    begin
-      Result := ServicesPedido.SListarPedidos(Req);
-    end);
-
-  RequestHandler.HandleRequestAndRespond(Req, Res);
+  TRequestHandler<TJSONArray>
+    .New(TServicesPedido.New.SListarPedidos(Req))
+    .HandleRequestAndRespond(Req, Res);
 end;
 {$ENDREGION}
 
 {$REGION ' CInserirEditarPedidos '}
 procedure CInserirEditarPedidos(Req: THorseRequest; Res: THorseResponse);
-var
-  RequestHandler: IRequestHandler<TJSONObject>;
-  ServicesPedido: IServicesPedido;
 begin
-  ServicesPedido := TServicesPedido.Create;
-
-  RequestHandler := TRequestHandler<TJSONObject>.Create(
-    function(Req: THorseRequest): TJSONObject
-    begin
-      Result := ServicesPedido.SInserirEditarPedidos(Req);
-    end);
-
-  RequestHandler.HandleRequestAndRespond(Req, Res);
+  TRequestHandler<TJSONObject>
+    .New(TServicesPedido.New.SInserirEditarPedidos(Req))
+    .HandleRequestAndRespond(Req, Res);
 end;
 {$ENDREGION}
 

@@ -35,7 +35,13 @@ uses
   Services.CondPagto in '..\Services\Services.CondPagto.pas',
   Repository.Interfaces.ICondPagtoRepository in '..\Repository\Interfaces\Repository.Interfaces.ICondPagtoRepository.pas',
   Repository.Classes.CondPagtoRepository in '..\Repository\Classes\Repository.Classes.CondPagtoRepository.pas',
-  SQL.CondPagto in '..\SQL\SQL.CondPagto.pas';
+  SQL.CondPagto in '..\SQL\SQL.CondPagto.pas',
+  SQL.Notificacoes in '..\SQL\SQL.Notificacoes.pas',
+  Repository.Classes.NotificacoesRepository in '..\Repository\Classes\Repository.Classes.NotificacoesRepository.pas',
+  Repository.Interfaces.INotificacoesRepository in '..\Repository\Interfaces\Repository.Interfaces.INotificacoesRepository.pas',
+  SQL.Cliente in '..\SQL\SQL.Cliente.pas',
+  Repository.Interfaces.IClienteRepository in '..\Repository\Interfaces\Repository.Interfaces.IClienteRepository.pas',
+  Repository.Classes.ClienteRepository in '..\Repository\Classes\Repository.Classes.ClienteRepository.pas';
 
 {$R *.res}
 

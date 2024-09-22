@@ -3,88 +3,58 @@ unit Services.Notificacoes;
 interface
 
 uses
-  system.JSON,
-  DataSet.Serialize,
-  Utilitarios,
-  System.SysUtils,
-  DM.Conexao,
-  Data.DB,
-  FireDAC.Comp.Client,
-  HashXMD5,
-  Horse.Exception,
-  Horse.HandleException,
-  Horse.Commons,
-  Controller.Auth,
   Horse,
-  Interfaces.Conexao,
-  Classe.Conexao;
+  System.JSON,
+  Repository.Classes.NotificacoesRepository,
+  Repository.Interfaces.INotificacoesRepository,
+  Controller.Auth,
+  DM.Conexao,
+  SQL.Notificacoes;
+
 type
-  TServicesNotificacoes = class(TDMConexao)
-  private
-    procedure MarcarNotificacoesLidas(CodUsuario: Integer);
-  public
-    function SListarNotificacoes(Req: THorseRequest): TJSONArray;
+  IServicesNotificacoes = interface(IInterface)
+  ['{9F7B20B5-10A9-4A1F-ADE2-FF97225D8C75}']
+   function SListarNotificacoes(Req: THorseRequest): TJSONArray;
   end;
+
+type
+  TServicesNotificacoes = class(TInterfacedObject, IServicesNotificacoes)
+  private
+    FNotificacoesRepository : INotificacoesRepository;
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    function SListarNotificacoes(Req: THorseRequest): TJSONArray;
+    Class function New: IServicesNotificacoes;
+  end;
+
 implementation
 
 { TServicesNotificacoes }
 
-{$REGION ' MarcarNotificacoesLidas '}
 
-procedure TServicesNotificacoes.MarcarNotificacoesLidas(CodUsuario: Integer);
+constructor TServicesNotificacoes.Create;
 begin
- var LSQL := ' update NOTIFICACAO'+
-             ' set IND_LIDO = ''S'' '+
-             ' where COD_USUARIO = :COD_USUARIO '+
-             ' and IND_LIDO = :IND_LIDO';
-
- var FQuery := TQueryFD.Create;
- try
-   FQuery
-    .SQL(LSQL)
-    .Params('COD_USUARIO', CodUsuario)
-    .Params('IND_LIDO', 'N')
-    .ExecSQL;
- finally
-   FQuery.Free;
- end;
+  FNotificacoesRepository := TNotificacoesRepository.Create;
 end;
 
-{$ENDREGION}
+destructor TServicesNotificacoes.Destroy;
+begin
+  FNotificacoesRepository := Nil;
+  inherited;
+end;
+
+class function TServicesNotificacoes.New: IServicesNotificacoes;
+begin
+  Result := Self.Create;
+end;
 
 {$REGION ' SListarNotificacoes '}
-
 function TServicesNotificacoes.SListarNotificacoes(Req: THorseRequest): TJSONArray;
 begin
-  var LCodigoUsuario := Controller.Auth.Get_Usuario_Request(Req);
-
-  var LSQL := ' select'+
-              ' COD_NOTIFICACAO,'+
-              ' DATA_NOTIFICACAO,'+
-              ' TITULO,'+
-              ' TEXTO'+
-              ' from NOTIFICACAO'+
-              ' where COD_USUARIO = :COD_USUARIO'+
-              ' and IND_LIDO = :IND_LIDO ';
-  try
-    var FQuery := TQueryFD.Create;
-    try
-       Result := FQuery
-                   .SQL(LSQL)
-                   .Params('COD_USUARIO', LCodigoUsuario)
-                   .Params('IND_LIDO', 'N')
-                   .Open
-                   .ToJSONArray;
-    finally
-      FQuery.Free;
-    end;
-  finally
-    //Se conseguir ler as notificações ela é marcarcada como lidas
-    Self.MarcarNotificacoesLidas(LCodigoUsuario);
-  end;
-
+  Result := TNotificacoesRepository.New.RListarNotificacoes(Req);
 end;
-
 {$ENDREGION}
 
 end.

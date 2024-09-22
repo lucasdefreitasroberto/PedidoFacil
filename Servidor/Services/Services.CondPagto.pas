@@ -23,6 +23,7 @@ type
     destructor Destroy; override;
     constructor Create;
     function SListarCondPagto: TJSONArray;
+    Class function New: IServicesCondPagto;
   end;
 
 implementation
@@ -38,6 +39,11 @@ destructor TServicesCondPagto.Destroy;
 begin
   FCondPagtoRepository := nil;
   inherited;
+end;
+
+class function TServicesCondPagto.New: IServicesCondPagto;
+begin
+  Result := Self.Create;
 end;
 
 {$REGION ' SListarCondPagto '}

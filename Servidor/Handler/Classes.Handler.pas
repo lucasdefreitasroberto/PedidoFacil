@@ -29,19 +29,39 @@ type
     procedure SendResponse(Res: THorseResponse; const GetResult: TFunc<TJSONArray>); overload;
     procedure SendResponse(Res: THorseResponse; const GetResult: TFunc<string>); overload;
     procedure SendResponse(Res: THorseResponse; const GetResult: TFunc<Integer>); overload;
+
+    {**********************************************************
+     Desta forma vou poder criar uma instância utilizando
+    um ponteiro de função, para eu não precisar
+    de ter que passar a function como método anônimo toda vez no controller
+    **********************************************************}
+    class function New(AServiceMethod: T): IRequestHandler<T>;
   end;
 
 implementation
 
 { TRequestHandler }
+{*****************************
+  por enquanto vai ficar assim....
+{*****************************}
 
 {****************************************************************************************
   TFunc<T1, TResult> é um tipo genérico que representa um ponteiro de função
-  Recebe um argumento do tipo T1 (neste caso, um THorseRequest) e Retorna um valor do tipo TResult (neste caso, o tipo genérico T)..
+  Recebe um argumento do tipo T1 (neste caso, um THorseRequest)
+  e Retorna um valor do tipo TResult (neste caso, o tipo genérico T)..
 ****************************************************************************************}
 constructor TRequestHandler<T>.Create(const AServiceMethod: TFunc<THorseRequest, T>);
 begin
   FServiceMethod := AServiceMethod;
+end;
+
+class function TRequestHandler<T>.New(AServiceMethod: T): IRequestHandler<T>;
+begin
+  Result := Self.Create(
+    function(Req: THorseRequest): T
+    begin
+      Result := AServiceMethod;
+    end);
 end;
 
 destructor TRequestHandler<T>.Destroy;
@@ -59,19 +79,18 @@ end;
 
  A solução é criar uma função genérica TFunc<TResult> para encapsular
  a obtenção do valor. Isso delega a responsabilidade de retornar o tipo esperado,
- permitindo trabalhar de forma mais flexível com TResult. Dessa forma,
- podemos verificar o tipo em tempo de execução e, com segurança, enviar o valor correto.
+ permitindo trabalhar de forma mais flexível com TResult.
+ Dessa forma, eu posso verificar o tipo em tempo de execução e, com segurança,
+ enviar o valor correto.
 *****************************************************************************************}
 procedure TRequestHandler<T>.HandleRequestAndRespond(Req: THorseRequest; Res: THorseResponse);
 begin
   try
-
     SendResponse(Res,
       function: T
       begin
         Result := FServiceMethod(Req);
       end);
-
   except
     on E: Exception do
     begin
@@ -91,14 +110,14 @@ end;
  ****************************************************************************************}
 procedure TRequestHandler<T>.SendResponse(Res: THorseResponse; const GetResult: TFunc<T>);
 begin
-  //
+  // Implementar envio genérico para diferentes tipos
 end;
 
 procedure TRequestHandler<T>.SendResponse(Res: THorseResponse; const GetResult: TFunc<TJSONObject>);
 var
   JsonResult: TJSONObject;
 begin
-  // Obtém o resultado da função passada
+  // Obtém o resultado
   JsonResult := GetResult();
   // Envia o JSON na resposta
   Res.Send(JsonResult).Status(THTTPStatus.OK);
@@ -129,4 +148,3 @@ begin
 end;
 
 end.
-

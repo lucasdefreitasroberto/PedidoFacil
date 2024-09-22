@@ -28,6 +28,7 @@ uses
 
     function SListarPedidos(Req: THorseRequest): TJSONArray;
     function SInserirEditarPedidos(Req: THorseRequest): TJSONObject;
+    Class function New: IServicesPedido;
   end;
 
 implementation
@@ -49,6 +50,11 @@ begin
   inherited;
 end;
 
+class function TServicesPedido.New: IServicesPedido;
+begin
+  Result := Self.Create;
+end;
+
 {$REGION ' SListarPedidos '}
 function TServicesPedido.SListarPedidos(Req: THorseRequest): TJSONArray;
 var
@@ -57,30 +63,25 @@ var
   LDtUltSinc: string;
   LPedidos: TJSONArray;
 begin
-  // Obter e validar a página
+
   try
     LPagina := Req.Query['pagina'].ToInteger;
   except
     LPagina := 1;
   end;
 
-  // Obter o código do usuário
   LCodigoUsuario := Controller.Auth.Get_Usuario_Request(Req);
 
-  //Calcular o LSkip
   LSkip := (LPagina * QTD_REG_PAGINA_PEDIDO) - QTD_REG_PAGINA_PEDIDO;
 
-  // Obter e validar a data de última sincronização
   LDtUltSinc := Req.Query['dt_ult_sincronizacao'];
 
   LDtValidate := TDateEmptyValidation.Create(LDtUltSinc);
   begin
     LDtValidate.Validate;
 
-    // Obter os pedidos do repositório
     LPedidos := FPedidoRepository.ListarPedidos(QTD_REG_PAGINA_PEDIDO, LSkip, LCodigoUsuario, LDtUltSinc);
 
-    // Adicionar os itens aos pedidos
     for var I := 0 to LPedidos.Size - 1 do
     begin
       var LCodigoPedido := LPedidos[I].GetValue<Integer>('cod_pedido', 0);
@@ -100,11 +101,9 @@ var
  LItens: TJSONArray;
 begin
   LCodigoUsuario := Controller.Auth.Get_Usuario_Request(Req);
-
   LPedidoData:= FPedidoRepository.ExtractPedidoData(Req.Body<TJSONObject>);
 
   LItens := Req.Body<TJSONObject>.GetValue<TJSONArray>('ITENS');
-
   Result := FPedidoRepository.InserirPedido(LCodigoUsuario, LPedidoData, LItens);
 end;
 {$ENDREGION}

@@ -20,19 +20,10 @@ implementation
 
 {$REGION ' CListarCondPagto '}
 procedure CListarCondPagto(Req: THorseRequest; Res: THorseResponse);
-var
-  RequestHandler: IRequestHandler<TJSONArray>;
-  ServicesPedido: IServicesCondPagto;
 begin
-  ServicesPedido := TServicesCondPagto.Create;
-
-  RequestHandler := TRequestHandler<TJSONArray>.Create(
-    function(Req: THorseRequest): TJSONArray
-    begin
-      Result := ServicesPedido.SListarCondPagto;
-    end);
-
-  RequestHandler.HandleRequestAndRespond(Req, Res);
+ TRequestHandler<TJSONArray>
+  .New(TServicesCondPagto.New.SListarCondPagto)
+  .HandleRequestAndRespond(Req, Res);
 end;
 {$ENDREGION}
 
@@ -40,8 +31,8 @@ end;
 procedure RegistrarRotas;
 begin
   THorse.AddCallback(HorseJWT(Controller.Auth.SECRET,
-    THorseJWTConfig.New.SessionClass(TMyClaims))).Get('/cond-pagto/sincronizacao',
-    CListarCondPagto);
+    THorseJWTConfig.New.SessionClass(TMyClaims)))
+    .Get('/cond-pagto/sincronizacao', CListarCondPagto);
 end;
 {$ENDREGION}
 

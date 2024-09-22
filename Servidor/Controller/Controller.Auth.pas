@@ -3,109 +3,99 @@ unit Controller.Auth;
 interface
 
 uses
-  Horse,  // Framework Horse para construir APIs REST
-  Horse.JWT,  // Middleware JWT para Horse, usado para autenticação
-  JOSE.Core.JWT,  // Manipulação de tokens JWT
-  JOSE.Core.Builder,  // Construtor de tokens JWT
-  JOSE.Types.JSON,  // Tipos JSON relacionados ao JWT
-  System.JSON,  // Manipulação de JSON nativa do Delphi
-  System.SysUtils,  // Funções utilitárias do sistema
-  System.DateUtils;  // Manipulação de datas
+  Horse,
+  Horse.JWT,
+  JOSE.Core.JWT,
+  JOSE.Core.Builder,
+  JOSE.Types.JSON,
+  System.JSON,
+  System.SysUtils,
+  System.DateUtils;
 
 const
-  SECRET = '[LUCAS-SECRET-KEY]';  // Chave secreta usada para assinar o token JWT
+  SECRET = '[LUCAS-DE-FREITAS-ROBERTO-SECRET-KEY]';
 
 type
-  // Estrutura que representa o resultado do token, incluindo o token gerado e sua expiração
+
   TTokenResult = record
-    Token: string;  // O token JWT gerado
-    Expiration: TDateTime;  // A data de expiração do token
+    Token: string;
+    Expiration: TDateTime;
   end;
 
 type
-  // Classe personalizada de claims (informações embutidas) do JWT
   TMyClaims = class(TJWTClaims)
   private
-    // Função para obter o código do usuário das claims do JWT
     function GetCodUsuario: Integer;
-    // Procedimento para definir o código do usuário nas claims do JWT
     procedure SetCodUsuario(const Value: Integer);
   public
-    // Propriedade pública para acessar o código do usuário
     property COD_USUARIO: Integer read GetCodUsuario write SetCodUsuario;
   end;
 
-function Criar_Token(Cod_Usuario: Integer): TTokenResult;  // Função para criar o token JWT
-function Get_Usuario_Request(Req: THorseRequest): Integer;  // Função para obter o usuário da requisição
+function Criar_Token(Cod_Usuario: Integer): TTokenResult;
+function Get_Usuario_Request(Req: THorseRequest): Integer;
 
 implementation
 
 {$REGION ' Criar_Token '}
-// Função que cria o token JWT com base no código de usuário
 function Criar_Token(Cod_Usuario: Integer): TTokenResult;
 var
-  LJWT: TJWT;  // Cria o token JWT
+  LJWT: TJWT;
   LClaims: TMyClaims;  // Armazena as claims (informações) que serão embutidas no token
 begin
   try
-    LJWT := TJWT.Create;  // Inicializa o token JWT
+    LJWT := TJWT.Create;
     LClaims := TMyClaims(LJWT.Claims);  // Obtém as claims"reivindicações" do token e converte para a classe customizada
 
     try
-      LClaims.COD_USUARIO := Cod_Usuario;  // Atribui o código do usuário às claims
-      LClaims.Expiration := IncDay(Now, 2);  // Define a expiração do token para 2 dias a partir de agora
-      Result.Token := TJOSE.SHA256CompactToken(SECRET, LJWT);  // Gera o token compactado com a chave secreta
-      Result.Expiration := LClaims.Expiration;  // Retorna a data de expiração junto com o token
+      LClaims.COD_USUARIO := Cod_Usuario;
+      LClaims.Expiration := IncDay(Now, 2);
+      Result.Token := TJOSE.SHA256CompactToken(SECRET, LJWT);
+      Result.Expiration := LClaims.Expiration;
     except
       on E: Exception do
       begin
-        Result.Token := '';  // Em caso de erro, retorna o token vazio
-        raise Exception.Create('Erro ao criar o token: ' + E.Message);  // Levanta uma exceção com a mensagem de erro
+        Result.Token := '';
+        raise Exception.Create('Erro ao criar o token: ' + E.Message);
       end;
     end;
   finally
-    FreeAndNil(LJWT);  // Libera o objeto LJWT para evitar vazamento de memória
+    FreeAndNil(LJWT);
   end;
 end;
 {$ENDREGION}
 
 {$REGION ' Get_Usuario_Request '}
-// Função que obtém o código do usuário a partir da requisição HTTP
 function Get_Usuario_Request(Req: THorseRequest): Integer;
 var
-  LClaims: TMyClaims;  // Objeto para armazenar as claims do JWT
+  LClaims: TMyClaims;
 begin
   try
     LClaims := Req.Session<TMyClaims>;  // Obtém as claims da sessão (se houver uma)
-    if Assigned(LClaims) then  // Verifica se as claims estão presentes
-      Result := LClaims.COD_USUARIO  // Retorna o código do usuário
-      //LClaims.FJSON.ToJSON
-
+    if Assigned(LClaims) then
+      Result := LClaims.COD_USUARIO
     else
-      raise Exception.Create('Sessão inválida ou expirada.');  // Levanta exceção se a sessão não for válida
+      raise Exception.Create('Sessão inválida ou expirada.');
   except
     on E: Exception do
     begin
-      Result := -1;  // Se houver erro, retorna -1 como valor de usuário inválido
-      raise Exception.Create('Erro ao obter o usuário da requisição: ' + E.Message);  // Levanta a exceção com a mensagem de erro
+      Result := -1;
+      raise Exception.Create('Erro ao obter o usuário da requisição: ' + E.Message);
     end;
   end;
 end;
 {$ENDREGION}
 
 {$REGION ' GetCodUsuario '}
-// Função que obtém o código do usuário da estrutura JSON armazenada no JWT
 function TMyClaims.GetCodUsuario: Integer;
 begin
-  Result := FJSON.GetValue<Integer>('id', 0);  // Acessa o campo 'id' das claims e retorna o valor como Integer
+  Result := FJSON.GetValue<Integer>('id', 0);
 end;
 {$ENDREGION}
 
 {$REGION ' SetCodUsuario '}
-// Procedimento que define o código do usuário nas claims do JWT
 procedure TMyClaims.SetCodUsuario(const Value: Integer);
 begin
-  TJSONUtils.SetJSONValueFrom<Integer>('id', Value, FJSON);  // Define o campo 'id' nas claims com o valor passado
+  TJSONUtils.SetJSONValueFrom<Integer>('id', Value, FJSON);
 end;
 {$ENDREGION}
 
