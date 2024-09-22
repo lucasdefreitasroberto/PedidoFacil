@@ -15,11 +15,11 @@
 ### Rotas
 ## **usuarios**
 
-![image](https://github.com/user-attachments/assets/af64ebd5-2dac-47cc-a948-8f836c145bcc)
+![image](https://github.com/user-attachments/assets/19bddcaf-6c01-4415-97ad-813c519b8eb7)
 
 ## **clientes**
 
-![image](https://github.com/user-attachments/assets/a44689de-2341-4731-88d4-c0625e08f01b)
+![image](https://github.com/user-attachments/assets/98d60a69-abbc-4a7d-942e-34bbbe59def2)
 
 ## **produtos**
 
