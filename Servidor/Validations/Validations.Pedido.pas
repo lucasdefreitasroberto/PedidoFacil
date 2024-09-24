@@ -26,6 +26,7 @@ type
   public
     constructor Create(Data: string);
     procedure Validate;
+    class function New(Data:string): IValidation;
   end;
 
 type
@@ -43,6 +44,11 @@ implementation
 constructor TDateEmptyValidation.Create(Data: string);
 begin
   FData := Data;
+end;
+
+class function TDateEmptyValidation.New(Data: string): IValidation;
+begin
+  Result := Self.Create(Data);
 end;
 
 procedure TDateEmptyValidation.Validate;

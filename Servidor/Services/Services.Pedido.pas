@@ -58,7 +58,7 @@ end;
 {$REGION ' SListarPedidos '}
 function TServicesPedido.SListarPedidos(Req: THorseRequest): TJSONArray;
 var
-  LPagina, LSkip, LCodigoUsuario: Integer;
+  LPagina, LSkip, LCodigoUsuario, LCodigoPedido: Integer;
   LDtValidate: IValidation;
   LDtUltSinc: string;
   LPedidos: TJSONArray;
@@ -71,25 +71,20 @@ begin
   end;
 
   LCodigoUsuario := Controller.Auth.Get_Usuario_Request(Req);
-
   LSkip := (LPagina * QTD_REG_PAGINA_PEDIDO) - QTD_REG_PAGINA_PEDIDO;
-
   LDtUltSinc := Req.Query['dt_ult_sincronizacao'];
+  TDateEmptyValidation.New(LDtUltSinc).Validate;
 
-  LDtValidate := TDateEmptyValidation.Create(LDtUltSinc);
+  LPedidos :=
+    FPedidoRepository.ListarPedidos(QTD_REG_PAGINA_PEDIDO, LSkip, LCodigoUsuario, LDtUltSinc);
+
+  for var I := 0 to LPedidos.Size - 1 do
   begin
-    LDtValidate.Validate;
-
-    LPedidos := FPedidoRepository.ListarPedidos(QTD_REG_PAGINA_PEDIDO, LSkip, LCodigoUsuario, LDtUltSinc);
-
-    for var I := 0 to LPedidos.Size - 1 do
-    begin
-      var LCodigoPedido := LPedidos[I].GetValue<Integer>('cod_pedido', 0);
+    LCodigoPedido := LPedidos[I].GetValue<Integer>('cod_pedido', 0);
       (LPedidos[I] as TJSONObject).AddPair('itens', FPedidoRepository.ListarItensPedido(LCodigoPedido));
-    end;
-
-    Result := LPedidos;
   end;
+
+  Result := LPedidos;
 end;
 {$ENDREGION}
 
