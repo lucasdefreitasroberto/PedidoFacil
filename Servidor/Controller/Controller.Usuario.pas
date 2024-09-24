@@ -11,7 +11,7 @@ uses
   system.JSON,
   Controller.Auth,
   Horse.JWT,
-  Horse.HandleException;
+  Horse.HandleException, Classes.Handler;
 
 procedure RegistrarRotas;
 
@@ -61,33 +61,9 @@ var
   LCodigoUser: Integer;
   LTokenResult: TTokenResult;
 begin
-  LService := TServicesUsuario.Create;
-  try
-
-    try
-      LJsonRetorno := LService.SLoginUsuario(Req.Body<TJSONObject>);
-
-      if LJsonRetorno.Size = 0 then
-        Res.Send('E-mail ou Senha inválida.').Status(THTTPStatus.Unauthorized)
-      else
-      begin
-        LCodigoUser := LJsonRetorno.GetValue<Integer>('cod_usuario', 0);
-        LTokenResult := Criar_Token(LCodigoUser);
-        LJsonRetorno.AddPair('token', LTokenResult.Token);
-        LJsonRetorno.AddPair('exp',
-          TJSONString.Create(FormatDateTime('dd-mm-yyyy hh:nn:ss',
-          LTokenResult.Expiration)));
-
-        Res.Send<TJSONObject>(LJsonRetorno).Status(THTTPStatus.Created);
-      end;
-    except
-      on ex: Exception do
-        Res.Send(ex.Message).Status(500);
-    end;
-
-  finally
-    FreeAndNil(LService);
-  end;
+ TRequestHandler<TJSONObject>
+    .New(TServicesUsuario.New.SLoginUsuario(Req))
+    .HandleRequestAndRespond(Req, Res);
 end;
 {$ENDREGION}
 
@@ -189,21 +165,21 @@ begin
 
   THorse.Post('/usuarios/login', CLogin);
 
-  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET, THorseJWTConfig.New.SessionClass(TMyClaims)))
-  .Post('/usuarios/push',
-  CPush);
+  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET,
+    THorseJWTConfig.New.SessionClass(TMyClaims)))
+    .Post('/usuarios/push', CPush);
 
-  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET, THorseJWTConfig.New.SessionClass(TMyClaims)))
-  .Put('/usuarios',
-  CEditarUsuario);
+  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET,
+    THorseJWTConfig.New.SessionClass(TMyClaims)))
+    .Put('/usuarios', CEditarUsuario);
 
-  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET, THorseJWTConfig.New.SessionClass(TMyClaims)))
-  .Put('/usuarios/senha',
-  CEditarSenha);
+  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET,
+    THorseJWTConfig.New.SessionClass(TMyClaims)))
+    .Put('/usuarios/senha', CEditarSenha);
 
-  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET, THorseJWTConfig.New.SessionClass(TMyClaims)))
-  .Get('/usuarios/horario',
-  ObterDataHoraServidor);
+  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET,
+    THorseJWTConfig.New.SessionClass(TMyClaims)))
+    .Get('/usuarios/horario', ObterDataHoraServidor);
 end;
 {$ENDREGION}
 

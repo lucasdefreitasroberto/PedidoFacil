@@ -33,13 +33,14 @@ type
     procedure Validate; override;
   end;
 
-  TEmailSenhaVaziaValidation = class(TBaseValidation)
+  TLoginVerifyValidation = class(TInterfacedObject, IValidation)
   private
     FEmail: string;
     FSenha: string;
   public
     constructor Create(const Email, Senha: string);
-    procedure Validate; override;
+    procedure Validate;
+    class function New(const Email, Senha: string): IValidation;
   end;
 
   TSenhaVaziaValidation = class(TBaseValidation)
@@ -69,9 +70,8 @@ type
   TEmailExistenteValidation = class(TBaseValidation)
   private
     FEmail: string;
-    FCon: TFDConnection;
   public
-    constructor Create(const Email: string; AConnection: TFDConnection);
+    constructor Create(const Email: string);
     procedure Validate; override;
   end;
 
@@ -107,13 +107,18 @@ end;
 
 
 { TEmailSenhaVaziaValidation }
-constructor TEmailSenhaVaziaValidation.Create(const Email, Senha: string);
+constructor TLoginVerifyValidation.Create(const Email, Senha: string);
 begin
   FEmail := Email;
   FSenha := Senha;
 end;
 
-procedure TEmailSenhaVaziaValidation.Validate;
+class function TLoginVerifyValidation.New(const Email, Senha: string): IValidation;
+begin
+  Result := Self.Create(Email, Senha);
+end;
+
+procedure TLoginVerifyValidation.Validate;
 begin
   if (FEmail.Trim.IsEmpty) or (FSenha.Trim.IsEmpty) then
     raise EHorseException.New.Error('Informe o e-mail e a senha');
@@ -157,10 +162,9 @@ begin
 end;
 
 { TEmailExistenteValidation }
-constructor TEmailExistenteValidation.Create(const Email: string; AConnection: TFDConnection);
+constructor TEmailExistenteValidation.Create(const Email: string);
 begin
   FEmail := Email;
-  FCon := AConnection;
 end;
 
 procedure TEmailExistenteValidation.Validate;
@@ -170,7 +174,7 @@ begin
               'where EMAIL = '+
               QuotedStr(FEmail);
 
-  var Query := TQueryExecutor.Create(FCon);
+  var Query := TQueryExecutor.Create(DMConexao.con);
   try
     var LCount := Query.ExecuteScalar(LSQL);
 

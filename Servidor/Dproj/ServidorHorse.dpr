@@ -41,7 +41,10 @@ uses
   Repository.Interfaces.INotificacoesRepository in '..\Repository\Interfaces\Repository.Interfaces.INotificacoesRepository.pas',
   SQL.Cliente in '..\SQL\SQL.Cliente.pas',
   Repository.Interfaces.IClienteRepository in '..\Repository\Interfaces\Repository.Interfaces.IClienteRepository.pas',
-  Repository.Classes.ClienteRepository in '..\Repository\Classes\Repository.Classes.ClienteRepository.pas';
+  Repository.Classes.ClienteRepository in '..\Repository\Classes\Repository.Classes.ClienteRepository.pas',
+  SQL.Usuario in '..\SQL\SQL.Usuario.pas',
+  Repository.Interfaces.IUsuarioRepository in '..\Repository\Interfaces\Repository.Interfaces.IUsuarioRepository.pas',
+  Repository.Classes.UsuarioRepository in '..\Repository\Classes\Repository.Classes.UsuarioRepository.pas';
 
 {$R *.res}
 
