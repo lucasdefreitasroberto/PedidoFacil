@@ -14,7 +14,8 @@ uses
   System.Classes,
   Horse.OctetStream,
   FireDAC.Stan.Intf,
-  FireDAC.Stan.StorageBin;
+  FireDAC.Stan.StorageBin,
+  System.Rtti;
 
 type
   TQueryFD = class(TInterfacedObject, iQuery)

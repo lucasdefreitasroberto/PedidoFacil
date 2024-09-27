@@ -26,6 +26,8 @@ type
   IServicesUsuario = interface
     ['{C7B44EBF-9C25-47D0-B102-9A065A80CD78}']
     function SLoginUsuario(Req: THorseRequest): TJSONObject;
+    function SInserirUsuarios(Req: THorseRequest): TJSONObject;
+    function SPush(Req: THorseRequest): TJSONObject;
   end;
 
 type
@@ -37,14 +39,11 @@ type
     destructor Destroy;
 
     function SLoginUsuario(Req: THorseRequest): TJSONObject;
-    function SInserirUsuarios(const AUsuario: TJSONObject): TJSONObject;
-    function SPush(const AUsuario: TJSONObject; Req: THorseRequest)
-      : TJSONObject;
-    function SEditarUsuario(const AUsuario: TJSONObject; Req: THorseRequest)
-      : TJSONObject;
-    function SEditarSenhaUsuario(const AUsuario: TJSONObject;
-      Req: THorseRequest): TJSONObject;
-    function SObterDataHoraServidor: String;
+    function SInserirUsuarios(Req: THorseRequest): TJSONObject;
+    function SPush(Req: THorseRequest): TJSONObject;
+    function SEditarUsuario(const AUsuario: TJSONObject; Req: THorseRequest): TJSONObject;
+    function SEditarSenhaUsuario(const AUsuario: TJSONObject; Req: THorseRequest): TJSONObject;
+    function SObterDataHoraServidor: string;
     class function New: IServicesUsuario;
   end;
 
@@ -67,122 +66,74 @@ begin
   Result := Self.Create;
 end;
 
-{$REGION ' InserirUsuarios '}
-
-function TServicesUsuario.SInserirUsuarios(const AUsuario: TJSONObject)
-  : TJSONObject;
-begin
-  var
-  LNome := AUsuario.GetValue<string>('nome', '');
-  var
-  LEmail := AUsuario.GetValue<string>('email', '');
-  var
-  LSenha := AUsuario.GetValue<string>('senha', '');
-
-  var
-  LNomeEmailSenhaVaziaValidation := TNomeEmailSenhaVaziaValidation.Create(LNome,
-    LEmail, LSenha);
-  var
-  LEmailExistenteValidation := TEmailExistenteValidation.Create(LEmail);
-  var
-  LSenhaTamanhoValidation := TSenhaTamanhoValidation.Create(LSenha);
-
-  try
-    LNomeEmailSenhaVaziaValidation.Validate;
-    LEmailExistenteValidation.Validate;
-    LSenhaTamanhoValidation.Validate;
-  finally
-    LNomeEmailSenhaVaziaValidation.Free;
-    LEmailExistenteValidation.Free;
-    LSenhaTamanhoValidation.Free;
-  end;
-
-  var
-  LSQL := ' insert into USUARIO ' + ' (NOME, EMAIL, SENHA)' + ' values ' +
-    ' (:NOME, :EMAIL, :SENHA)' + ' returning COD_USUARIO, NOME, EMAIL';
-
-  var
-  FQuery := TQueryFD.Create;
-  try
-    Result := FQuery.SQL(LSQL).Params('NOME', LNome)
-      .Params('SENHA', SaltPassword(LSenha)).Params('EMAIL', LEmail)
-      .Open.ToJSONObject;
-  finally
-    FQuery.Free;
-  end;
-end;
-{$ENDREGION}
-
 {$REGION ' Login '}
-
 function TServicesUsuario.SLoginUsuario(Req: THorseRequest): TJSONObject;
 var
-  LJsonRetorno: TJSONObject;
+  LJsonRetorno, Body: TJSONObject;
+  LEmail, LSenha: string;
+  LCodigoUser : integer;
+  LTokenResult: TTokenResult;
 begin
-  var
-  LEmail :=
-    Req.Body<TJSONObject>.GetValue<string>('email', '');
-  var
-  LSenha :=
-    Req.Body<TJSONObject>.GetValue<string>('senha', '');
+  Body := Req.Body<TJSONObject>;
+  LEmail := Body.GetValue<string>('email', '');
+  LSenha := Body.GetValue<string>('senha', '');
 
   TLoginVerifyValidation.New(LEmail, LSenha).Validate;
-
-  LJsonRetorno :=
-    FUsuarioRepository.RLoginUsuario(LEmail, LSenha);
+  LJsonRetorno := FUsuarioRepository.RLoginUsuario(LEmail, LSenha);
 
   if LJsonRetorno.Size = 0 then
-    EHorseException.New.Error('E-mail ou Senha inválida.').Status(THTTPStatus.Unauthorized)
+    EHorseException.New.Error('E-mail ou Senha inválida.')
+      .Status(THTTPStatus.Unauthorized)
   else
   begin
-    var
     LCodigoUser := LJsonRetorno.GetValue<Integer>('cod_usuario', 0);
-    var
-    LTokenResult := Criar_Token(LCodigoUser);
+    LTokenResult := Controller.Auth.Criar_Token(LCodigoUser);
+
     LJsonRetorno.AddPair('token', LTokenResult.Token);
     LJsonRetorno.AddPair('exp',
       TJSONString.Create(FormatDateTime('dd-mm-yyyy hh:nn:ss',
-      LTokenResult.Expiration)));
+        LTokenResult.Expiration)));
 
     Result := LJsonRetorno;
   end;
 end;
+{$ENDREGION}
 
+{$REGION ' InserirUsuarios '}
+function TServicesUsuario.SInserirUsuarios(Req: THorseRequest): TJSONObject;
+var
+  Body : TJSONObject;
+  LNome, LEmail, LSenha: string;
+begin
+  Body   := Req.Body<TJSONObject>;
+  LNome  := Body.GetValue<string>('nome', '');
+  LEmail := Body.GetValue<string>('email', '');
+  LSenha := Body.GetValue<string>('senha', '');
+
+  TEmptyLoginValidation.New([LNome, LEmail, LSenha]).Validate;
+  TEmailExistenteValidation.New(LEmail).Validate;
+  TSenhaTamanhoValidation.New(LSenha).Validate;
+
+  Result := FUsuarioRepository.RInserirUsuario(LNome, LEmail, LSenha);
+end;
 {$ENDREGION}
 
 {$REGION ' Push '}
-
-function TServicesUsuario.SPush(const AUsuario: TJSONObject; Req: THorseRequest)
-  : TJSONObject;
+function TServicesUsuario.SPush(Req: THorseRequest): TJSONObject;
+var
+  Body: TJSONObject;
+  LTokenPush: string;
+  LCodigoUsuario: Integer;
 begin
-  var
-  LTokenPush := AUsuario.GetValue<string>('token_push', '');
-  var
+  Body := Req.Body<TJSONObject>;
+  LTokenPush := Body.GetValue<string>('token_push', '');
   LCodigoUsuario := Controller.Auth.Get_Usuario_Request(Req);
+  TTokenPushVazioValidation.New(LTokenPush).Validate;
 
-  var
-  LTokenPushVazioValidation := TTokenPushVazioValidation.Create(LTokenPush);
-
-  try
-    LTokenPushVazioValidation.Validate;
-  finally
-    LTokenPushVazioValidation.Free;
-  end;
-
-  var
-  LSQL := ' update USUARIO ' + ' set TOKEN_PUSH = :TOKEN_PUSH ' +
-    ' where (COD_USUARIO = :COD_USUARIO) ' + ' returning COD_USUARIO ';
-
-  var
-  FQuery := TQueryFD.Create;
-  try
-    Result := FQuery.SQL(LSQL).Params('TOKEN_PUSH', LTokenPush)
-      .Params('COD_USUARIO', LCodigoUsuario).Open.ToJSONObject;
-  finally
-    FQuery.Free;
-  end;
+  Result := FUsuarioRepository.RUpdateTokenPush(LCodigoUsuario, LTokenPush);
 end;
 {$ENDREGION}
+
 {$REGION ' EditarUsuario '}
 
 function TServicesUsuario.SEditarUsuario(const AUsuario: TJSONObject;
@@ -223,6 +174,7 @@ begin
   end;
 end;
 {$ENDREGION}
+
 {$REGION ' EditarSenha '}
 
 function TServicesUsuario.SEditarSenhaUsuario(const AUsuario: TJSONObject;
@@ -260,6 +212,7 @@ begin
   end;
 end;
 {$ENDREGION}
+
 {$REGION ' SObterDataServidor '}
 
 function TServicesUsuario.SObterDataHoraServidor: String;

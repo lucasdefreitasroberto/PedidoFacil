@@ -15,19 +15,9 @@ function sqlListarPedidos: string;
 begin
   Result :=
   ' select first :FIRST skip :SKIP '+
-  '   COD_PEDIDO, '+
-  '   COD_CLIENTE, '+
-  '   COD_USUARIO, '+
-  '   TIPO_PEDIDO, '+
-  '   DATA_PEDIDO, '+
-  '   CONTATO, '+
-  '   OBS, '+
-  '   VALOR_TOTAL, '+
-  '   COD_COND_PAGTO, '+
-  '   PRAZO_ENTREGA, '+
-  '   DATA_ENTREGA, '+
-  '   COD_PEDIDO_LOCAL, '+
-  '   DATA_ULT_ALTERACAO '+
+  '   COD_PEDIDO, COD_CLIENTE, COD_USUARIO, TIPO_PEDIDO, '+
+  '   DATA_PEDIDO, CONTATO, OBS, VALOR_TOTAL, COD_COND_PAGTO, '+
+  '   PRAZO_ENTREGA, DATA_ENTREGA, COD_PEDIDO_LOCAL, DATA_ULT_ALTERACAO '+
   ' from PEDIDO '+
   '   where DATA_ULT_ALTERACAO > :DATA_ULT_ALTERACAO '+
   '   and COD_USUARIO = :COD_USUARIO '+

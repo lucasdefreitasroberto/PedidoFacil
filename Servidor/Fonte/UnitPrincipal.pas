@@ -40,8 +40,6 @@ uses
 
 {$R *.fmx}
 
-{$REGION ' FormShow '}
-
 procedure TfrmPrincipal.FormShow(Sender: TObject);
 begin
   TServerHorse.StartServer(9000);
@@ -50,6 +48,6 @@ begin
     mmo.Lines.Add('Servidor executando na porta: ' + TServerHorse.PortRunner +
       sLineBreak + 'Log: '+DateTimeToStr(Now));
 end;
-{$ENDREGION}
 
 end.
+

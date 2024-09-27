@@ -65,6 +65,12 @@
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Android' and '$(Cfg_2)'=='true') or '$(Cfg_2_Android)'!=''">
+        <Cfg_2_Android>true</Cfg_2_Android>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
     <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
         <Cfg_2_Win32>true</Cfg_2_Win32>
         <CfgParent>Cfg_2</CfgParent>
@@ -98,6 +104,7 @@
         <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
         <SanitizedProjectName>ServidorHorse</SanitizedProjectName>
         <DCC_UnitSearchPath>modules\.dcp;modules\.dcu;modules;modules\dataset-serialize\src;modules\delphi-jose-jwt\Source\Common;modules\delphi-jose-jwt\Source\JOSE;modules\delphi-jose-jwt\Source;modules\handle-exception\src;modules\hashlib4pascal\HashLib\src\Base;modules\hashlib4pascal\HashLib\src\Checksum;modules\hashlib4pascal\HashLib\src\Crypto\Blake2BParams;modules\hashlib4pascal\HashLib\src\Crypto\Blake2SParams;modules\hashlib4pascal\HashLib\src\Crypto;modules\hashlib4pascal\HashLib\src\Hash128;modules\hashlib4pascal\HashLib\src\Hash32;modules\hashlib4pascal\HashLib\src\Hash64;modules\hashlib4pascal\HashLib\src\Include;modules\hashlib4pascal\HashLib\src\Interfaces;modules\hashlib4pascal\HashLib\src\Interfaces\IBlake2BParams;modules\hashlib4pascal\HashLib\src\Interfaces\IBlake2SParams;modules\hashlib4pascal\HashLib\src\KDF;modules\hashlib4pascal\HashLib\src\NullDigest;modules\hashlib4pascal\HashLib\src\Nullable;modules\hashlib4pascal\HashLib\src\Packages\FPC;modules\hashlib4pascal\HashLib\src\Utils;modules\hashlib4pascal\HashLib.Benchmark\src\Core;modules\hashlib4pascal\HashLib.Benchmark\src\Forms\FMX;modules\hashlib4pascal\HashLib.Tests\src;modules\horse\src;modules\horse-cors\src;modules\horse-jwt\src;modules\horse-octet-stream\src;modules\horse-upload\src;modules\jhonson\src;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_Define>USE_CONSOLE;$(DCC_Define)</DCC_Define>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android)'!=''">
         <DCC_UsePackage>DBXSqliteDriver;tethering;FireDACDBXDriver;RESTBackendComponents;bindengine;CloudService;DataSnapClient;bindcompdbx;IndyIPServer;IndySystem;fmxFireDAC;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;rtl;DbxClientDriver;IndyIPClient;DataSnapProviderClient;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;bindcompfmx;FmxTeeUI;fmx;FireDACIBDriver;dbexpress;IndyCore;dsnap;emsclient;DataSnapCommon;FireDACCommon;soapserver;FireDACCommonDriver;inet;IndyIPCommon;FireDAC;FireDACSqliteDriver;ibmonitor;ibxpress;ibxbindings;FireDACDSDriver;CustomIPTransport;bindcomp;dbxcds;dsnapxml;dbrtl;IndyProtocols;$(DCC_UsePackage)</DCC_UsePackage>
@@ -245,9 +252,15 @@
         <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
         <DCC_DebugInformation>0</DCC_DebugInformation>
     </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Android)'!=''">
+        <VerInfo_Build>1</VerInfo_Build>
+        <Android_NotificationAccentColor>#000000</Android_NotificationAccentColor>
+    </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
@@ -259,55 +272,51 @@
         </DelphiCompile>
         <DCCReference Include="..\fonte\UnitPrincipal.pas">
             <Form>frmPrincipal</Form>
-            <FormType>fmx</FormType>
-        </DCCReference>
-        <DCCReference Include="..\controller\Controller.Usuario.pas">
-            <Form>DM.Conexao in &apos;..\DataModule\DM.Conexao.pas&apos; {DMConexao</Form>
-            <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="..\DataModule\DM.Conexao.pas">
             <Form>DMConexao</Form>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="..\Utils\Utilitarios.pas"/>
-        <DCCReference Include="..\Services\Services.Usuario.pas"/>
         <DCCReference Include="..\Fonte\Server.Horse.pas"/>
         <DCCReference Include="..\Utils\HashXMD5.pas"/>
         <DCCReference Include="..\Controller\Controller.Auth.pas"/>
         <DCCReference Include="..\Controller\Controller.Notificacoes.pas"/>
-        <DCCReference Include="..\Services\Services.Notificacoes.pas"/>
+        <DCCReference Include="..\controller\Controller.Usuario.pas"/>
         <DCCReference Include="..\Controller\Controller.Cliente.pas"/>
+        <DCCReference Include="..\Controller\Controller.Produto.pas"/>
+        <DCCReference Include="..\Controller\Controller.Pedido.pas"/>
+        <DCCReference Include="..\Controller\Controller.CondPagto.pas"/>
+        <DCCReference Include="..\Services\Services.Notificacoes.pas"/>
+        <DCCReference Include="..\Services\Services.Usuario.pas"/>
         <DCCReference Include="..\Services\Services.Cliente.pas"/>
+        <DCCReference Include="..\Services\Services.Produto.pas"/>
+        <DCCReference Include="..\Services\Services.Pedido.pas"/>
+        <DCCReference Include="..\Services\Services.CondPagto.pas"/>
         <DCCReference Include="..\InfraConexao\Classe.Conexao.pas"/>
         <DCCReference Include="..\InfraConexao\Interfaces.Conexao.pas"/>
         <DCCReference Include="..\Validations\Validations.Usuario.pas"/>
         <DCCReference Include="..\Validations\Validations.Cliente.pas"/>
-        <DCCReference Include="..\Controller\Controller.Produto.pas"/>
-        <DCCReference Include="..\Services\Services.Produto.pas"/>
         <DCCReference Include="..\Validations\Validations.Produto.pas"/>
         <DCCReference Include="..\Validations\Validations.pas"/>
-        <DCCReference Include="..\Controller\Controller.Pedido.pas"/>
-        <DCCReference Include="..\Services\Services.Pedido.pas"/>
-        <DCCReference Include="..\Sql\SQL.Pedido.pas"/>
         <DCCReference Include="..\Validations\Validations.Pedido.pas"/>
         <DCCReference Include="..\Handler\Interfaces.Handler.pas"/>
         <DCCReference Include="..\Handler\Classes.Handler.pas"/>
         <DCCReference Include="..\Repository\Interfaces\Repository.Interfaces.IPedidoRepository.pas"/>
         <DCCReference Include="..\Repository\Classes\Repository.Classes.PedidoRepository.pas"/>
-        <DCCReference Include="..\Controller\Controller.CondPagto.pas"/>
-        <DCCReference Include="..\Services\Services.CondPagto.pas"/>
         <DCCReference Include="..\Repository\Interfaces\Repository.Interfaces.ICondPagtoRepository.pas"/>
         <DCCReference Include="..\Repository\Classes\Repository.Classes.CondPagtoRepository.pas"/>
-        <DCCReference Include="..\SQL\SQL.CondPagto.pas"/>
-        <DCCReference Include="..\SQL\SQL.Notificacoes.pas"/>
         <DCCReference Include="..\Repository\Classes\Repository.Classes.NotificacoesRepository.pas"/>
         <DCCReference Include="..\Repository\Interfaces\Repository.Interfaces.INotificacoesRepository.pas"/>
-        <DCCReference Include="..\SQL\SQL.Cliente.pas"/>
         <DCCReference Include="..\Repository\Interfaces\Repository.Interfaces.IClienteRepository.pas"/>
         <DCCReference Include="..\Repository\Classes\Repository.Classes.ClienteRepository.pas"/>
-        <DCCReference Include="..\SQL\SQL.Usuario.pas"/>
         <DCCReference Include="..\Repository\Interfaces\Repository.Interfaces.IUsuarioRepository.pas"/>
         <DCCReference Include="..\Repository\Classes\Repository.Classes.UsuarioRepository.pas"/>
+        <DCCReference Include="..\SQL\SQL.CondPagto.pas"/>
+        <DCCReference Include="..\SQL\SQL.Notificacoes.pas"/>
+        <DCCReference Include="..\Sql\SQL.Pedido.pas"/>
+        <DCCReference Include="..\SQL\SQL.Cliente.pas"/>
+        <DCCReference Include="..\SQL\SQL.Usuario.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

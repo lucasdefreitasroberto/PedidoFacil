@@ -5,7 +5,12 @@ interface
 uses
   Data.DB,
   System.JSON,
-  System.Classes;
+  System.Classes,
+  System.Generics.Collections,
+  System.Generics.Defaults,
+  System.Rtti,
+  System.SysUtils,
+  FireDAC.Comp.Client;
 
 type
   iQuery = interface

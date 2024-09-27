@@ -10,18 +10,18 @@ uses
   DM.Conexao,
   FireDAC.Comp.Client,
   Horse.Commons,
-  Validations;
+  Validations,
+  SQL.Usuario;
 
 type
 
-  TNomeEmailSenhaVaziaValidation = class(TBaseValidation)
+  TEmptyLoginValidation = class(TInterfacedObject, IValidation)
   private
-    FNome: string;
-    FEmail: string;
-    FSenha: string;
+    FValues: TArray<string>;
   public
-    constructor Create(const Nome, Email, Senha: string);
-    procedure Validate; override;
+    constructor Create(const Values: array of string);
+    procedure Validate;
+    class function New(Const Values: array of string): IValidation;
   end;
 
   TNomeEmailVaziaValidation = class(TBaseValidation)
@@ -51,45 +51,55 @@ type
     procedure Validate; override;
   end;
 
-  TSenhaTamanhoValidation = class(TBaseValidation)
+  TSenhaTamanhoValidation = class(TInterfacedObject, IValidation)
   private
     FSenha: string;
   public
     constructor Create(const Senha: string);
-    procedure Validate; override;
+    procedure Validate;
+    class function New(const Senha: string): IValidation;
   end;
 
-  TTokenPushVazioValidation = class(TBaseValidation)
+  TTokenPushVazioValidation = class(TInterfacedObject, IValidation)
   private
     FTokenPush: string;
   public
     constructor Create(const TokenPush: string);
-    procedure Validate; override;
+    procedure Validate;
+    class function New(const TokenPush: string): IValidation;
   end;
 
-  TEmailExistenteValidation = class(TBaseValidation)
+  TEmailExistenteValidation = class(TInterfacedObject, IValidation)
   private
     FEmail: string;
   public
     constructor Create(const Email: string);
-    procedure Validate; override;
+    procedure Validate;
+    class function New(const Email: string): IValidation;
   end;
 
 implementation
 
 { TNomeEmailSenhaVaziaValidation }
-constructor TNomeEmailSenhaVaziaValidation.Create(const Nome, Email,
-  Senha: string);
+constructor TEmptyLoginValidation.Create(const Values: array of string);
 begin
-  FNome := Nome;
-  FEmail := Email;
-  FSenha := Senha;
+  FValues := FValues;
 end;
 
-procedure TNomeEmailSenhaVaziaValidation.Validate;
+class function TEmptyLoginValidation.New(Const Values: array of string): IValidation;
 begin
-  if (FNome.Trim.IsEmpty) or (FEmail.Trim.IsEmpty) or (FSenha.Trim.IsEmpty) then
-    raise EHorseException.New.Error('Informe o nome, e-mail e a senha');
+  Result := Self.Create(Values);
+end;
+
+procedure TEmptyLoginValidation.Validate;
+var
+  Value: string;
+begin
+  for Value in FValues do
+  begin
+    if Value.Trim.IsEmpty then
+      raise EHorseException.New.Error('Informe o nome, e-mail e a senha corretamente');
+  end;
 end;
 
 { TNomeEmailVaziaValidation }
@@ -142,6 +152,11 @@ begin
   FSenha := Senha;
 end;
 
+class function TSenhaTamanhoValidation.New(const Senha: string): IValidation;
+begin
+  Result := Self.Create(Senha);
+end;
+
 procedure TSenhaTamanhoValidation.Validate;
 begin
   if FSenha.Length < 5 then
@@ -153,6 +168,11 @@ end;
 constructor TTokenPushVazioValidation.Create(const TokenPush: string);
 begin
   FTokenPush := TokenPush;
+end;
+
+class function TTokenPushVazioValidation.New(const TokenPush: string): IValidation;
+begin
+  Result := Self.Create(TokenPush);
 end;
 
 procedure TTokenPushVazioValidation.Validate;
@@ -167,21 +187,25 @@ begin
   FEmail := Email;
 end;
 
-procedure TEmailExistenteValidation.Validate;
+class function TEmailExistenteValidation.New(const Email: string): IValidation;
 begin
-  var LSQL := 'select count(*) AS EmailCount ' +
-              'from USUARIO ' +
-              'where EMAIL = '+
-              QuotedStr(FEmail);
+  Result := Self.Create(Email);
+end;
 
-  var Query := TQueryExecutor.Create(DMConexao.con);
+procedure TEmailExistenteValidation.Validate;
+var
+  LCount: Integer;
+  Query: IQueryExecutor;
+begin
+  DMConexao := TDMConexao.Create;
   try
-    var LCount := Query.ExecuteScalar(LSQL);
+    Query := TQueryExecutor.Create(DMConexao.con);
+    LCount := Query.ExecuteScalar(SQL.Usuario.sqlValidarEmail);
 
     if (LCount > 0) then
       raise EHorseException.New.Error('Esse e-mail já está em uso por outra conta');
   finally
-    Query.Free;
+    DMConexao.Free;
   end;
 end;
 

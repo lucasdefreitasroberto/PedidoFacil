@@ -18,48 +18,16 @@ procedure RegistrarRotas;
 implementation
 
 {$REGION ' CInserirUsuarios '}
-
 procedure CInserirUsuario(Req: THorseRequest; Res: THorseResponse; Next: TProc);
-var
-  LJsonRetorno: TJSONObject;
-  LCodigoUser: Integer;
-  LService: TServicesUsuario;
-  LTokenResult: TTokenResult;
 begin
-  LService := TServicesUsuario.Create;
-  try
-
-    try
-      LJsonRetorno := LService.SInserirUsuarios(Req.Body<TJSONObject>);
-      LCodigoUser := LJsonRetorno.GetValue<Integer>('cod_usuario', 0);
-      // LJsonRetorno.AddPair('token', Criar_Token(LCodigoUser)); {GERANDO TOKEN PELO ID}
-
-      LTokenResult := Criar_Token(LCodigoUser);
-
-      LJsonRetorno.AddPair('token', LTokenResult.Token);
-      LJsonRetorno.AddPair('exp',
-        TJSONString.Create(FormatDateTime('dd-mm-yyyy hh:nn:ss',
-        LTokenResult.Expiration)));
-
-      Res.Send<TJSONObject>(LJsonRetorno).Status(THTTPStatus.Created);
-    except
-      on ex: Exception do
-        Res.Send(ex.Message).Status(500);
-    end;
-
-  finally
-    FreeAndNil(LService);
-  end;
+  TRequestHandler<TJSONObject>
+    .New(TServicesUsuario.New.SInserirUsuarios(Req))
+    .HandleRequestAndRespond(Req, Res);
 end;
 {$ENDREGION}
 
 {$REGION ' CLogin '}
 procedure CLogin(Req: THorseRequest; Res: THorseResponse; Next: TProc);
-var
-  LService: TServicesUsuario;
-  LJsonRetorno: TJSONObject;
-  LCodigoUser: Integer;
-  LTokenResult: TTokenResult;
 begin
  TRequestHandler<TJSONObject>
     .New(TServicesUsuario.New.SLoginUsuario(Req))
@@ -69,24 +37,10 @@ end;
 
 {$REGION ' CPush '}
 procedure CPush(Req: THorseRequest; Res: THorseResponse; Next: TProc);
-var
-  LService: TServicesUsuario;
-  LJsonRetorno: TJSONObject;
 begin
-  LService := TServicesUsuario.Create;
-  try
-
-    try
-      LJsonRetorno := LService.SPush(Req.Body<TJSONObject>, Req);
-      Res.Send<TJSONObject>(LJsonRetorno).Status(THTTPStatus.OK);
-    except
-      on ex: Exception do
-        Res.Send(ex.Message).Status(THTTPStatus.Unauthorized);
-    end;
-
-  finally
-    FreeAndNil(LService);
-  end;
+ TRequestHandler<TJSONObject>
+    .New(TServicesUsuario.New.SPush(Req))
+    .HandleRequestAndRespond(Req, Res);
 end;
 {$ENDREGION}
 
