@@ -28,6 +28,7 @@ type
     function SLoginUsuario(Req: THorseRequest): TJSONObject;
     function SInserirUsuarios(Req: THorseRequest): TJSONObject;
     function SPush(Req: THorseRequest): TJSONObject;
+    function SEditarUsuario(Req: THorseRequest): TJSONObject;
   end;
 
 type
@@ -41,7 +42,7 @@ type
     function SLoginUsuario(Req: THorseRequest): TJSONObject;
     function SInserirUsuarios(Req: THorseRequest): TJSONObject;
     function SPush(Req: THorseRequest): TJSONObject;
-    function SEditarUsuario(const AUsuario: TJSONObject; Req: THorseRequest): TJSONObject;
+    function SEditarUsuario(Req: THorseRequest): TJSONObject;
     function SEditarSenhaUsuario(const AUsuario: TJSONObject; Req: THorseRequest): TJSONObject;
     function SObterDataHoraServidor: string;
     class function New: IServicesUsuario;
@@ -135,16 +136,18 @@ end;
 {$ENDREGION}
 
 {$REGION ' EditarUsuario '}
-
-function TServicesUsuario.SEditarUsuario(const AUsuario: TJSONObject;
-  Req: THorseRequest): TJSONObject;
+function TServicesUsuario.SEditarUsuario(Req: THorseRequest): TJSONObject;
+var
+  Body: TJSONObject;
+  LTokenPush: string;
+  LCodigoUsuario: Integer;
 begin
-  var
+  Body := Req.Body<TJSONObject>;
   LCodigoUsuario := Controller.Auth.Get_Usuario_Request(Req);
   var
-  LNome := AUsuario.GetValue<string>('nome', '');
+  LNome := Body.GetValue<string>('nome', '');
   var
-  LEmail := AUsuario.GetValue<string>('email', '');
+  LEmail := Body.GetValue<string>('email', '');
 
   var
   LNomeEmailVaziaValidation := TNomeEmailVaziaValidation.Create(LNome, LEmail);
@@ -160,9 +163,7 @@ begin
   end;
 
   var
-  LSQL := ' update USUARIO ' + ' set NOME = :NOME, ' + ' EMAIL = :EMAIL ' +
-    ' where (COD_USUARIO = :COD_USUARIO) ' +
-    ' returning COD_USUARIO, NOME, EMAIL ';
+  LSQL :=
 
   var
   FQuery := TQueryFD.Create;

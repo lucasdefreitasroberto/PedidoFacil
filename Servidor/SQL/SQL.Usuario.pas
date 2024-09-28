@@ -6,6 +6,7 @@ function sqlLogin: string;
 function sqlInserirUsuario: string;
 function sqlValidarEmail: string;
 function sqlUpdateTokenPush: string;
+function sqlEditarUsuario: string;
 
 implementation
 
@@ -42,6 +43,16 @@ begin
     ' set TOKEN_PUSH = :TOKEN_PUSH ' +
     ' where (COD_USUARIO = :COD_USUARIO) ' +
     ' returning COD_USUARIO ';
+end;
+
+function sqlEditarUsuario: string;
+begin
+  Result :=
+  ' update USUARIO ' +
+  ' set NOME = :NOME, ' +
+  ' EMAIL = :EMAIL ' +
+  ' where (COD_USUARIO = :COD_USUARIO) ' +
+  ' returning COD_USUARIO, NOME, EMAIL ';
 end;
 
 end.
