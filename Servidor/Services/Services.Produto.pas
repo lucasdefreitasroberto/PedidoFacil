@@ -74,10 +74,7 @@ begin
 
   var
   LDtUltSincronizacao := Req.Query['dt_ult_sincronizacao'];
-
-  var
-  LDtUltSincVazia := TDtUltSincVaziaValidation.Create(LDtUltSincronizacao);
-  LDtUltSincVazia.Validate;
+  TDtUltSincVaziaValidation.New(LDtUltSincronizacao).Validate;
 
   var
   FQuery := TQueryFD.Create;
@@ -91,7 +88,6 @@ begin
                 .ToJSONArray;
   finally
     FQuery.Free;
-    LDtUltSincVazia.Free;
   end;
 
 end;
@@ -111,14 +107,7 @@ begin
   var
   LProdutoDados := Self.ExtrairProdutoData(LProduto);
 
-  var
-  LDescricaoProdValidate := TDescVazioValidation.Create(LProdutoDados.Descricao);
-
-  try
-    LDescricaoProdValidate.Validate;
-  finally
-    LDescricaoProdValidate.Free;
-  end;
+  TDescVazioValidation.New(LProdutoDados.Descricao);
 
   if LProdutoDados.CodProdutoOficial = 0 then
     LSQL := Self.SQLInsertProduto

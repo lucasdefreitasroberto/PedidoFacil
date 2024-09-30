@@ -1,4 +1,4 @@
-unit Classes.Handler;
+Ôªøunit Classes.Handler;
 
 interface
 
@@ -20,10 +20,10 @@ type
     constructor Create(const AServiceMethod: TFunc<THorseRequest, T>);
     destructor Destroy; override;
 
-    // MÈtodo para lidar com a requisiÁ„o e enviar a resposta
+    // M√©todo para lidar com a requisi√ß√£o e enviar a resposta
     procedure HandleRequestAndRespond(Req: THorseRequest; Res: THorseResponse);
 
-   // Envia a resposta com o resultado de uma funÁ„o genÈrica
+   // Envia a resposta com o resultado de uma fun√ß√£o gen√©rica
     procedure SendResponse(Res: THorseResponse; const GetResult: TFunc<T>); overload;
     procedure SendResponse(Res: THorseResponse; const GetResult: TFunc<TJSONObject>); overload;
     procedure SendResponse(Res: THorseResponse; const GetResult: TFunc<TJSONArray>); overload;
@@ -31,9 +31,9 @@ type
     procedure SendResponse(Res: THorseResponse; const GetResult: TFunc<Integer>); overload;
 
     {**********************************************************
-     Desta forma vou poder criar uma inst‚ncia utilizando
-    um ponteiro de funÁ„o, para eu n„o precisar
-    de ter que passar a function como mÈtodo anÙnimo toda vez no controller
+     Desta forma vou poder criar uma inst√¢ncia utilizando
+    um ponteiro de fun√ß√£o, para eu n√£o precisar
+    de ter que passar a function como m√©todo an√¥nimo toda vez no controller
     **********************************************************}
     class function New(AServiceMethod: T): IRequestHandler<T>;overload;
     class function New: IRequestHandler<THorseRequest>; overload;
@@ -47,9 +47,9 @@ implementation
 {*****************************}
 
 {****************************************************************************************
-  TFunc<T1, TResult> È um tipo genÈrico que representa um ponteiro de funÁ„o
+  TFunc<T1, TResult> √© um tipo gen√©rico que representa um ponteiro de fun√ß√£o
   Recebe um argumento do tipo T1 (neste caso, um THorseRequest)
-  e Retorna um valor do tipo TResult (neste caso, o tipo genÈrico T)..
+  e Retorna um valor do tipo TResult (neste caso, o tipo gen√©rico T)..
 ****************************************************************************************}
 constructor TRequestHandler<T>.Create(const AServiceMethod: TFunc<THorseRequest, T>);
 begin
@@ -66,7 +66,7 @@ begin
 end;
 
 {*************************
- Se n„o passar, vai receber HorseRequest como padr„o
+ Se n√£o passar, vai receber HorseRequest como padr√£o
 *************************}
 class function TRequestHandler<T>.New: IRequestHandler<THorseRequest>;
 begin
@@ -84,16 +84,16 @@ begin
 end;
 
 {****************************************************************************************
- Procedimento que lida com a requisiÁ„o e envia a resposta
+ Procedimento que lida com a requisi√ß√£o e envia a resposta
 
- Res.Send<T> n„o funciona diretamente com tipos genÈricos, pois o Delphi
- realiza a verificaÁ„o do tipo em tempo de compilaÁ„o. Como T È genÈrico,
- o compilador n„o consegue determinar o tipo correto para o Send, resultando em erros.
+ Res.Send<T> n√£o funciona diretamente com tipos gen√©ricos, pois o Delphi
+ realiza a verifica√ß√£o do tipo em tempo de compila√ß√£o. Como T √© gen√©rico,
+ o compilador n√£o consegue determinar o tipo correto para o Send, resultando em erros.
 
- A soluÁ„o È criar uma funÁ„o genÈrica TFunc<TResult> para encapsular
- a obtenÁ„o do valor. Isso delega a responsabilidade de retornar o tipo esperado,
- permitindo trabalhar de forma mais flexÌvel com TResult.
- Dessa forma, eu posso verificar o tipo em tempo de execuÁ„o e, com seguranÁa,
+ A solu√ß√£o √© criar uma fun√ß√£o gen√©rica TFunc<TResult> para encapsular
+ a obten√ß√£o do valor. Isso delega a responsabilidade de retornar o tipo esperado,
+ permitindo trabalhar de forma mais flex√≠vel com TResult.
+ Dessa forma, eu posso verificar o tipo em tempo de execu√ß√£o e, com seguran√ßa,
  enviar o valor correto.
 *****************************************************************************************}
 procedure TRequestHandler<T>.HandleRequestAndRespond(Req: THorseRequest; Res: THorseResponse);
@@ -113,24 +113,24 @@ begin
 end;
 
 {****************************************************************************************
-  SendResponse: A funÁ„o SendResponse recebe como argumento uma funÁ„o genÈrica (TFunc<T>)
+  SendResponse: A fun√ß√£o SendResponse recebe como argumento uma fun√ß√£o gen√©rica (TFunc<T>)
     que, quando chamada, retorna o valor de tipo T.
 
-  Ela ent„o verifica o tipo do valor e faz o envio correto da resposta,
+  Ela ent√£o verifica o tipo do valor e faz o envio correto da resposta,
   seja TJSONObject, TJSONArray, string, ou Integer.
 
-  Porem eu preciso de deixar essa implementaÁ„o para digamos "Enganar o compilador"
+  Porem eu preciso de deixar essa implementa√ß√£o para digamos "Enganar o compilador"
  ****************************************************************************************}
 procedure TRequestHandler<T>.SendResponse(Res: THorseResponse; const GetResult: TFunc<T>);
 begin
-  // Implementar envio genÈrico para diferentes tipos
+  // Implementar envio gen√©rico para diferentes tipos
 end;
 
 procedure TRequestHandler<T>.SendResponse(Res: THorseResponse; const GetResult: TFunc<TJSONObject>);
 var
   JsonResult: TJSONObject;
 begin
-  // ObtÈm o resultado
+  // Obt√©m o resultado
   JsonResult := GetResult();
   // Envia o JSON na resposta
   Res.Send(JsonResult).Status(THTTPStatus.OK);

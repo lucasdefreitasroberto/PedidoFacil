@@ -29,6 +29,8 @@ type
     function SInserirUsuarios(Req: THorseRequest): TJSONObject;
     function SPush(Req: THorseRequest): TJSONObject;
     function SEditarUsuario(Req: THorseRequest): TJSONObject;
+    function SEditarSenhaUsuario(Req: THorseRequest): TJSONObject;
+    function SObterDataHoraServidor: String;
   end;
 
 type
@@ -43,8 +45,8 @@ type
     function SInserirUsuarios(Req: THorseRequest): TJSONObject;
     function SPush(Req: THorseRequest): TJSONObject;
     function SEditarUsuario(Req: THorseRequest): TJSONObject;
-    function SEditarSenhaUsuario(const AUsuario: TJSONObject; Req: THorseRequest): TJSONObject;
-    function SObterDataHoraServidor: string;
+    function SEditarSenhaUsuario(Req: THorseRequest): TJSONObject;
+    function SObterDataHoraServidor: String;
     class function New: IServicesUsuario;
   end;
 
@@ -80,11 +82,10 @@ begin
   LSenha := Body.GetValue<string>('senha', '');
 
   TLoginVerifyValidation.New(LEmail, LSenha).Validate;
-  LJsonRetorno := FUsuarioRepository.RLoginUsuario(LEmail, LSenha);
+  LJsonRetorno := FUsuarioRepository.RLoginUsuario(LEmail, LSenha.ToLower);
 
   if LJsonRetorno.Size = 0 then
-    EHorseException.New.Error('E-mail ou Senha inválida.')
-      .Status(THTTPStatus.Unauthorized)
+   raise EHorseException.New.Error('E-mail ou Senha inválida.').Status(THTTPStatus.Unauthorized)
   else
   begin
     LCodigoUser := LJsonRetorno.GetValue<Integer>('cod_usuario', 0);
@@ -97,6 +98,7 @@ begin
 
     Result := LJsonRetorno;
   end;
+
 end;
 {$ENDREGION}
 
@@ -139,83 +141,40 @@ end;
 function TServicesUsuario.SEditarUsuario(Req: THorseRequest): TJSONObject;
 var
   Body: TJSONObject;
-  LTokenPush: string;
+  LNome, LEmail: string;
   LCodigoUsuario: Integer;
 begin
   Body := Req.Body<TJSONObject>;
   LCodigoUsuario := Controller.Auth.Get_Usuario_Request(Req);
-  var
   LNome := Body.GetValue<string>('nome', '');
-  var
   LEmail := Body.GetValue<string>('email', '');
 
-  var
-  LNomeEmailVaziaValidation := TNomeEmailVaziaValidation.Create(LNome, LEmail);
-  var
-  LEmailExistenteValidation := TEmailExistenteValidation.Create(LEmail);
+  TNomeEmailVaziaValidation.New(LNome, LEmail).Validate;
+  TEmailExistenteValidation.New(LEmail).Validate;
 
-  try
-    LNomeEmailVaziaValidation.Validate;
-    LEmailExistenteValidation.Validate;
-  finally
-    LNomeEmailVaziaValidation.Free;
-    LEmailExistenteValidation.Free;
-  end;
-
-  var
-  LSQL :=
-
-  var
-  FQuery := TQueryFD.Create;
-  try
-    Result := FQuery.SQL(LSQL).Params('NOME', LNome).Params('EMAIL', LEmail)
-      .Params('COD_USUARIO', LCodigoUsuario).Open.ToJSONObject
-  finally
-    FQuery.Free;
-  end;
+  Result := FUsuarioRepository.REditarUsuario(LCodigoUsuario, LNome, LEmail);
 end;
 {$ENDREGION}
 
 {$REGION ' EditarSenha '}
-
-function TServicesUsuario.SEditarSenhaUsuario(const AUsuario: TJSONObject;
-  Req: THorseRequest): TJSONObject;
+function TServicesUsuario.SEditarSenhaUsuario(Req: THorseRequest): TJSONObject;
+var
+  Body: TJSONObject;
+  LSenha: string;
+  LCodigoUsuario: Integer;
 begin
-  var
-  LSenha := AUsuario.GetValue<string>('senha', '');
-  var
+  Body := Req.Body<TJSONObject>;
   LCodigoUsuario := Controller.Auth.Get_Usuario_Request(Req);
+  LSenha := Body.GetValue<string>('senha', '');
 
-  var
-  LSenhaVaziaValidation := TSenhaVaziaValidation.Create(LSenha);
-  var
-  LSenhaTamanhoValidation := TSenhaTamanhoValidation.Create(LSenha);
+  TSenhaValidation.New(LSenha).Validate;
+  TSenhaTamanhoValidation.New(LSenha).Validate;
 
-  try
-    LSenhaVaziaValidation.Validate;
-    LSenhaTamanhoValidation.Validate;
-  finally
-    LSenhaVaziaValidation.Free;
-    LSenhaTamanhoValidation.Free;
-  end;
-
-  var
-  LSQL := ' update USUARIO ' + ' set SENHA = :SENHA ' +
-    ' where (COD_USUARIO = :COD_USUARIO) ' + ' returning COD_USUARIO ';
-
-  var
-  FQuery := TQueryFD.Create;
-  try
-    Result := FQuery.SQL(LSQL).Params('SENHA', SaltPassword(LSenha))
-      .Params('COD_USUARIO', LCodigoUsuario).Open.ToJSONObject;
-  finally
-    FQuery.Free;
-  end;
+  Result := FUsuarioRepository.REditarSenha(LCodigoUsuario, LSenha);
 end;
 {$ENDREGION}
 
 {$REGION ' SObterDataServidor '}
-
 function TServicesUsuario.SObterDataHoraServidor: String;
 begin
   Result := FormatDateTime('dd-mm-yyyy hh:nn:ss', Now);

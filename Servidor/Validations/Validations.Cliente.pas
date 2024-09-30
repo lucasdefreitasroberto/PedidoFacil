@@ -6,68 +6,75 @@ uses
   System.SysUtils,
   Horse.Exception,
   Classe.Conexao,
-  utilitarios,
+  Utilitarios,
   DM.Conexao,
   FireDAC.Comp.Client,
   Horse.Commons,
   Validations;
 
 type
-
-  TDtUltSincVaziaValidation = class(TInterfacedObject, IValidation)
-  private
-    FData: string;
-  public
-    constructor Create(const Data: string);
+  // Interface para validações
+  IValidation = interface
+    ['{A1C5F19F-5B7D-4D19-A6BB-5AD3BA7BCF39}']
     procedure Validate;
+  end;
+
+  // Classe base para validações de strings
+  TBaseStringValidation = class(TInterfacedObject, IValidation)
+  private
+    FValue: string;
+    FErrorMessage: string;
+  public
+    constructor Create(const Value: string; const ErrorMessage: string);
+    procedure Validate;
+    class function New(const Value: string; const ErrorMessage: string): IValidation;
+  end;
+
+  // Validação para a Data de Sincronização
+  TDtUltSincVaziaValidation = class(TBaseStringValidation)
+  public
     class function New(const Data: string): IValidation;
   end;
 
-  TInserirClienteValidation = class(TInterfacedObject, IValidation)
-  private
-    FNome: string;
+  // Validação para Nome do Cliente
+  TInserirClienteValidation = class(TBaseStringValidation)
   public
-    constructor Create(const Nome: string);
-    procedure Validate;
     class function New(const Nome: string): IValidation;
   end;
 
 implementation
 
-{ TDtUltSincronizacaoVaziaValidation }
+{ TBaseStringValidation }
 
-constructor TDtUltSincVaziaValidation.Create(const Data: string);
+constructor TBaseStringValidation.Create(const Value: string; const ErrorMessage: string);
 begin
-  FData := Data;
+  FValue := Value;
+  FErrorMessage := ErrorMessage;
 end;
+
+class function TBaseStringValidation.New(const Value: string; const ErrorMessage: string): IValidation;
+begin
+  Result := Self.Create(Value, ErrorMessage);
+end;
+
+procedure TBaseStringValidation.Validate;
+begin
+  if FValue.Trim.IsEmpty then
+    raise EHorseException.New.Error(FErrorMessage);
+end;
+
+{ TDtUltSincVaziaValidation }
 
 class function TDtUltSincVaziaValidation.New(const Data: string): IValidation;
 begin
-  Result := Self.Create(Data);
-end;
-
-procedure TDtUltSincVaziaValidation.Validate;
-begin
-  if (FData = EmptyStr) then
-    raise EHorseException.New.Error('Parâmetro dt_ult_sincronizacao não informado')
+  Result := TBaseStringValidation.New(Data, 'Parâmetro dt_ult_sincronizacao não informado');
 end;
 
 { TInserirClienteValidation }
 
-constructor TInserirClienteValidation.Create(const Nome: string);
-begin
-  FNome := Nome;
-end;
-
 class function TInserirClienteValidation.New(const Nome: string): IValidation;
 begin
-  Result := Self.Create(Nome);
-end;
-
-procedure TInserirClienteValidation.Validate;
-begin
-  if (FNome = EmptyStr) then
-    raise EHorseException.New.Error('Nome do cliente precisa ser informado')
+  Result := TBaseStringValidation.New(Nome, 'Nome do cliente precisa ser informado');
 end;
 
 end.

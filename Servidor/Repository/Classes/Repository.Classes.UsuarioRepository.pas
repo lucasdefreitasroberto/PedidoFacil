@@ -18,6 +18,8 @@ type
     function RLoginUsuario(const Email, Senha: string): TJSONObject;
     function RInserirUsuario(const Nome, Email, Senha: string): TJSONObject;
     function RUpdateTokenPush(CodigoUsuario: Integer; TokenPush: string): TJSONObject;
+    function REditarUsuario(const CodigoUsuario: Integer; Nome, Email: string): TJSONObject;
+    function REditarSenha(const CodigoUsuario: Integer; Senha: string): TJSONObject;
 end;
 
 implementation
@@ -73,5 +75,24 @@ begin
       .ToJSONObject;
 end;
 
+function TUsuarioRepository.REditarUsuario(const CodigoUsuario: Integer; Nome, Email: string): TJSONObject;
+begin
+  Result :=
+    TQueryFD.New.SQL(SQL.Usuario.sqlEditarUsuario)
+      .Params('NOME', Nome)
+      .Params('EMAIL', Email)
+      .Params('COD_USUARIO', CodigoUsuario)
+      .Open.ToJSONObject
+end;
+
+function TUsuarioRepository.REditarSenha(const CodigoUsuario: Integer; Senha: string): TJSONObject;
+begin
+  Result :=
+    TQueryFD.New.SQL(SQL.Usuario.sqlEditarSenha)
+      .Params('SENHA', SaltPassword(Senha))
+      .Params('COD_USUARIO', CodigoUsuario)
+      .Open
+      .ToJSONObject;
+end;
 end.
 

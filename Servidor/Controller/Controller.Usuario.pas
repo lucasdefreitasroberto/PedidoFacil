@@ -46,69 +46,28 @@ end;
 
 {$REGION ' CEditarUsuario '}
 procedure CEditarUsuario(Req: THorseRequest; Res: THorseResponse; Next: TProc);
-var
-  LJsonRetorno: TJSONObject;
-  LService: TServicesUsuario;
 begin
-  LService := TServicesUsuario.Create;
-  try
-
-    try
-      LJsonRetorno := LService.SEditarUsuario(Req.Body<TJSONObject>, Req);
-      Res.Send<TJSONObject>(LJsonRetorno).Status(THTTPStatus.OK);
-    except
-      on ex: Exception do
-        Res.Send(ex.Message).Status(500);
-    end;
-
-  finally
-    FreeAndNil(LService);
-  end;
+  TRequestHandler<TJSONObject>
+    .New(TServicesUsuario.New.SEditarUsuario(Req))
+    .HandleRequestAndRespond(Req, Res);
 end;
 {$ENDREGION}
 
 {$REGION ' CEditarSenha '}
 procedure CEditarSenha(Req: THorseRequest; Res: THorseResponse; Next: TProc);
-var
-  LJsonRetorno: TJSONObject;
-  LService: TServicesUsuario;
 begin
-  LService := TServicesUsuario.Create;
-  try
-
-    try
-      LJsonRetorno := LService.SEditarSenhaUsuario(Req.Body<TJSONObject>, Req);
-      Res.Send<TJSONObject>(LJsonRetorno).Status(THTTPStatus.OK);
-    except
-      on ex: Exception do
-        Res.Send(ex.Message).Status(500);
-    end;
-
-  finally
-    FreeAndNil(LService);
-  end;
+  TRequestHandler<TJSONObject>
+    .New(TServicesUsuario.New.SEditarSenhaUsuario(Req))
+    .HandleRequestAndRespond(Req, Res);
 end;
 {$ENDREGION}
 
 {$REGION ' ObterDataHoraServidor '}
-procedure ObterDataHoraServidor(Req: THorseRequest; Res: THorseResponse;
-  Next: TProc);
-var
-  LService: TServicesUsuario;
+procedure ObterDataHoraServidor(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 begin
-  LService := TServicesUsuario.Create;
-  try
-
-    try
-      Res.Send(LService.SObterDataHoraServidor).Status(THTTPStatus.OK);
-    except
-      on ex: Exception do
-        Res.Send(ex.Message).Status(500);
-    end;
-
-  finally
-    FreeAndNil(LService);
-  end;
+  TRequestHandler<string>
+    .New(TServicesUsuario.New.SObterDataHoraServidor)
+    .HandleRequestAndRespond(Req, Res);
 end;
 {$ENDREGION}
 
@@ -119,20 +78,16 @@ begin
 
   THorse.Post('/usuarios/login', CLogin);
 
-  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET,
-    THorseJWTConfig.New.SessionClass(TMyClaims)))
+  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET, THorseJWTConfig.New.SessionClass(TMyClaims)))
     .Post('/usuarios/push', CPush);
 
-  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET,
-    THorseJWTConfig.New.SessionClass(TMyClaims)))
+  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET, THorseJWTConfig.New.SessionClass(TMyClaims)))
     .Put('/usuarios', CEditarUsuario);
 
-  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET,
-    THorseJWTConfig.New.SessionClass(TMyClaims)))
+  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET, THorseJWTConfig.New.SessionClass(TMyClaims)))
     .Put('/usuarios/senha', CEditarSenha);
 
-  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET,
-    THorseJWTConfig.New.SessionClass(TMyClaims)))
+  THorse.AddCallback(HorseJWT(Controller.Auth.SECRET, THorseJWTConfig.New.SessionClass(TMyClaims)))
     .Get('/usuarios/horario', ObterDataHoraServidor);
 end;
 {$ENDREGION}

@@ -14,43 +14,48 @@ uses
   SQL.Usuario;
 
 type
+  // Interface para validações
+  IValidation = interface
+    ['{A1C5F19F-5B7D-4D19-A6BB-5AD3BA7BCF39}']
+    procedure Validate;
+  end;
 
-  TEmptyLoginValidation = class(TInterfacedObject, IValidation)
+  // Classe base para validações de strings implementando IValidation
+  TBaseStringValidation = class(TInterfacedObject, IValidation)
   private
     FValues: TArray<string>;
+    FErrorMessage: string;
   public
-    constructor Create(const Values: array of string);
+    constructor Create(const Values: TArray<string>; const ErrorMessage: string);
     procedure Validate;
-    class function New(Const Values: array of string): IValidation;
+    class function New(const Values: TArray<string>; const ErrorMessage: string): IValidation;
   end;
 
-  TNomeEmailVaziaValidation = class(TBaseValidation)
-  private
-    FNome: string;
-    FEmail: string;
+  // Validação de Login
+  TEmptyLoginValidation = class(TBaseStringValidation)
   public
-    constructor Create(const Nome, Email: string);
-    procedure Validate; override;
+    class function New(const Values: TArray<string>): IValidation;
   end;
 
-  TLoginVerifyValidation = class(TInterfacedObject, IValidation)
-  private
-    FEmail: string;
-    FSenha: string;
+  // Validação de Nome e Email vazios
+  TNomeEmailVaziaValidation = class(TBaseStringValidation)
   public
-    constructor Create(const Email, Senha: string);
-    procedure Validate;
+    class function New(const Nome, Email: string): IValidation;
+  end;
+
+  // Validação de Login com Email e Senha
+  TLoginVerifyValidation = class(TBaseStringValidation)
+  public
     class function New(const Email, Senha: string): IValidation;
   end;
 
-  TSenhaVaziaValidation = class(TBaseValidation)
-  private
-    FSenha: string;
+  // Validação de Senha vazia
+  TSenhaValidation = class(TBaseStringValidation)
   public
-    constructor Create(const Senha: string);
-    procedure Validate; override;
+    class function New(const Senha: string): IValidation;
   end;
 
+  // Validação de tamanho da Senha
   TSenhaTamanhoValidation = class(TInterfacedObject, IValidation)
   private
     FSenha: string;
@@ -60,15 +65,13 @@ type
     class function New(const Senha: string): IValidation;
   end;
 
-  TTokenPushVazioValidation = class(TInterfacedObject, IValidation)
-  private
-    FTokenPush: string;
+  // Validação de Token Push vazio
+  TTokenPushVazioValidation = class(TBaseStringValidation)
   public
-    constructor Create(const TokenPush: string);
-    procedure Validate;
     class function New(const TokenPush: string): IValidation;
   end;
 
+  // Validação de Email Existente
   TEmailExistenteValidation = class(TInterfacedObject, IValidation)
   private
     FEmail: string;
@@ -80,73 +83,60 @@ type
 
 implementation
 
-{ TNomeEmailSenhaVaziaValidation }
-constructor TEmptyLoginValidation.Create(const Values: array of string);
+{ TBaseStringValidation }
+
+constructor TBaseStringValidation.Create(const Values: TArray<string>; const ErrorMessage: string);
 begin
-  FValues := FValues;
+  FValues := Values;
+  FErrorMessage := ErrorMessage;
 end;
 
-class function TEmptyLoginValidation.New(Const Values: array of string): IValidation;
+class function TBaseStringValidation.New(const Values: TArray<string>; const ErrorMessage: string): IValidation;
 begin
-  Result := Self.Create(Values);
+  Result := Self.Create(Values, ErrorMessage);
 end;
 
-procedure TEmptyLoginValidation.Validate;
+procedure TBaseStringValidation.Validate;
 var
   Value: string;
 begin
   for Value in FValues do
   begin
     if Value.Trim.IsEmpty then
-      raise EHorseException.New.Error('Informe o nome, e-mail e a senha corretamente');
+      raise EHorseException.New.Error(FErrorMessage);
   end;
 end;
 
+{ TEmptyLoginValidation }
+
+class function TEmptyLoginValidation.New(const Values: TArray<string>): IValidation;
+begin
+  Result := TBaseStringValidation.New(Values, 'Informe o nome, e-mail e a senha corretamente');
+end;
+
 { TNomeEmailVaziaValidation }
-constructor TNomeEmailVaziaValidation.Create(const Nome, Email: string);
+
+class function TNomeEmailVaziaValidation.New(const Nome, Email: string): IValidation;
 begin
-  FNome := Nome;
-  FEmail := Email;
+  Result := TBaseStringValidation.New([Nome, Email], 'Informe o nome e o e-mail');
 end;
 
-procedure TNomeEmailVaziaValidation.Validate;
-begin
-  if (FNome.Trim.IsEmpty) or (FEmail.Trim.IsEmpty) then
-    raise EHorseException.New.Error('Informe o nome e o e-mail');
-end;
-
-
-{ TEmailSenhaVaziaValidation }
-constructor TLoginVerifyValidation.Create(const Email, Senha: string);
-begin
-  FEmail := Email;
-  FSenha := Senha;
-end;
+{ TLoginVerifyValidation }
 
 class function TLoginVerifyValidation.New(const Email, Senha: string): IValidation;
 begin
-  Result := Self.Create(Email, Senha);
+  Result := TBaseStringValidation.New([Email, Senha], 'Informe o e-mail e a senha');
 end;
 
-procedure TLoginVerifyValidation.Validate;
-begin
-  if (FEmail.Trim.IsEmpty) or (FSenha.Trim.IsEmpty) then
-    raise EHorseException.New.Error('Informe o e-mail e a senha');
-end;
+{ TSenhaValidation }
 
-{ TSenhaVaziaValidation }
-constructor TSenhaVaziaValidation.Create(const Senha: string);
+class function TSenhaValidation.New(const Senha: string): IValidation;
 begin
-  FSenha := Senha;
-end;
-
-procedure TSenhaVaziaValidation.Validate;
-begin
-  if FSenha.Trim.IsEmpty then
-    raise EHorseException.New.Error('Informe a senha do usuário');
+  Result := TBaseStringValidation.New([Senha], 'Informe a senha do usuário');
 end;
 
 { TSenhaTamanhoValidation }
+
 constructor TSenhaTamanhoValidation.Create(const Senha: string);
 begin
   FSenha := Senha;
@@ -163,25 +153,15 @@ begin
     raise EHorseException.New.Error('A senha deve ter no mínimo 5 caracteres').Status(THTTPStatus.BadRequest);
 end;
 
-
 { TTokenPushVazioValidation }
-constructor TTokenPushVazioValidation.Create(const TokenPush: string);
-begin
-  FTokenPush := TokenPush;
-end;
 
 class function TTokenPushVazioValidation.New(const TokenPush: string): IValidation;
 begin
-  Result := Self.Create(TokenPush);
-end;
-
-procedure TTokenPushVazioValidation.Validate;
-begin
-  if FTokenPush.Trim.IsEmpty then
-    raise EHorseException.New.Error('Informe o token push do usuário');
+  Result := TBaseStringValidation.New([TokenPush], 'Informe o token push do usuário');
 end;
 
 { TEmailExistenteValidation }
+
 constructor TEmailExistenteValidation.Create(const Email: string);
 begin
   FEmail := Email;
@@ -195,18 +175,24 @@ end;
 procedure TEmailExistenteValidation.Validate;
 var
   LCount: Integer;
-  Query: IQueryExecutor;
+  Query: TQueryExecutor;
+  DMConexao: TDMConexao;
 begin
   DMConexao := TDMConexao.Create;
   try
     Query := TQueryExecutor.Create(DMConexao.con);
-    LCount := Query.ExecuteScalar(SQL.Usuario.sqlValidarEmail);
+    try
+      LCount := Query.ExecuteScalar(SQL.Usuario.sqlValidarEmail);
 
-    if (LCount > 0) then
-      raise EHorseException.New.Error('Esse e-mail já está em uso por outra conta');
+      if LCount > 0 then
+        raise EHorseException.New.Error('Esse e-mail já está em uso por outra conta');
+    finally
+      FreeAndNil(Query);  // Certifique-se de liberar o Query
+    end;
   finally
-    DMConexao.Free;
+    DMConexao.Free;  // Libere a conexão corretamente
   end;
 end;
 
 end.
+

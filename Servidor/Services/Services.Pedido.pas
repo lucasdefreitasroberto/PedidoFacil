@@ -94,11 +94,13 @@ var
  LCodigoUsuario : Integer;
  LPedidoData : RPedidoData;
  LItens: TJSONArray;
+ Body: TJSONObject;
 begin
   LCodigoUsuario := Controller.Auth.Get_Usuario_Request(Req);
   LPedidoData:= FPedidoRepository.ExtractPedidoData(Req.Body<TJSONObject>);
-
-  LItens := Req.Body<TJSONObject>.GetValue<TJSONArray>('ITENS');
+  Body := Req.Body<TJSONObject>;
+  LItens := Body.GetValue<TJSONArray>('itens');
+  TItensEmptyValidation.New(LItens).Validate;
   Result := FPedidoRepository.InserirPedido(LCodigoUsuario, LPedidoData, LItens);
 end;
 {$ENDREGION}

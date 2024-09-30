@@ -14,49 +14,68 @@ uses
   System.Classes;
 
 type
-
-  TDtUltSincVaziaValidation = class(TBaseValidation)
-  private
-    FData: string;
-  public
-    constructor Create(const Data: string);
+  // Interface para validações
+  IValidation = interface
+    ['{D13998A5-AF83-47C8-BF7A-12C72D7A2F44}']
     procedure Validate;
   end;
 
-  TDescVazioValidation = class(TBaseValidation)
+  // Classe base para validações de strings
+  TBaseStringValidation = class(TInterfacedObject, IValidation)
   private
-    FNome: string;
+    FValue: string;
+    FErrorMessage: string;
   public
-    constructor Create(const Nome: string);
+    constructor Create(const Value: string; const ErrorMessage: string);
     procedure Validate;
+    class function New(const Value: string; const ErrorMessage: string): IValidation;
+  end;
+
+  // Validação para Data de Sincronização Vazia
+  TDtUltSincVaziaValidation = class(TBaseStringValidation)
+  public
+    class function New(const Data: string): IValidation;
+  end;
+
+  // Validação para Descrição do Produto Vazia
+  TDescVazioValidation = class(TBaseStringValidation)
+  public
+    class function New(const Nome: string): IValidation;
   end;
 
 implementation
 
-{ TDtUltSincronizacaoVaziaValidation }
+{ TBaseStringValidation }
 
-constructor TDtUltSincVaziaValidation.Create(const Data: string);
+constructor TBaseStringValidation.Create(const Value: string; const ErrorMessage: string);
 begin
-  FData := Data;
+  FValue := Value;
+  FErrorMessage := ErrorMessage;
 end;
 
-procedure TDtUltSincVaziaValidation.Validate;
+class function TBaseStringValidation.New(const Value: string; const ErrorMessage: string): IValidation;
 begin
-  if (FData = EmptyStr) then
-    raise EHorseException.New.Error('Parâmetro dt_ult_sincronizacao não informado')
+  Result := Self.Create(Value, ErrorMessage);
 end;
 
-{ TNomeVazioValidation }
-
-constructor TDescVazioValidation.Create(const Nome: string);
+procedure TBaseStringValidation.Validate;
 begin
-  FNome := Nome;
+  if FValue.Trim.IsEmpty then
+    raise EHorseException.New.Error(FErrorMessage);
 end;
 
-procedure TDescVazioValidation.Validate;
+{ TDtUltSincVaziaValidation }
+
+class function TDtUltSincVaziaValidation.New(const Data: string): IValidation;
 begin
-  if (FNome = EmptyStr) then
-    raise EHorseException.New.Error('Nome do Produto precisa ser informado').Status(THTTPStatus.PaymentRequired)
+  Result := TBaseStringValidation.New(Data, 'Parâmetro dt_ult_sincronizacao não informado');
+end;
+
+{ TDescVazioValidation }
+
+class function TDescVazioValidation.New(const Nome: string): IValidation;
+begin
+  Result := TBaseStringValidation.New(Nome, 'Nome do Produto precisa ser informado');
 end;
 
 end.

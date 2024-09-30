@@ -13,6 +13,8 @@ type
     function RLoginUsuario(const Email, Senha: string): TJSONObject;
     function RInserirUsuario(const Nome, Email, Senha: string): TJSONObject;
     function RUpdateTokenPush(CodigoUsuario: Integer; TokenPush: string): TJSONObject;
+    function REditarUsuario(const CodigoUsuario: Integer; Nome, Email: string): TJSONObject;
+    function REditarSenha(const CodigoUsuario: Integer; Senha: string): TJSONObject;
   end;
 
 implementation

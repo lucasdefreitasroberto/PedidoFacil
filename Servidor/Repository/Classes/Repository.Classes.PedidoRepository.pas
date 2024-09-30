@@ -81,15 +81,7 @@ function TPedidoRepository.InserirPedido(CodigoUsuario: Integer; PedidoData: RPe
       Result := DateStr;
   end;
 
-var
-  LValidateItens: IValidation;
 begin
-  try
-    LValidateItens := TItensEmptyValidation.Create(itens);
-  finally
-    LValidateItens.Validate;
-  end;
-
   Result :=
    TQueryFD.New
     .SQL(SQL.Pedido.sqlInsertOrUpdatePedido)
