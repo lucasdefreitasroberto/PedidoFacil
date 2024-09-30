@@ -277,9 +277,9 @@
             <Form>DMConexao</Form>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
-        <DCCReference Include="..\Utils\Utilitarios.pas"/>
+        <DCCReference Include="..\Extensions\Utilitarios.pas"/>
         <DCCReference Include="..\Fonte\Server.Horse.pas"/>
-        <DCCReference Include="..\Utils\HashXMD5.pas"/>
+        <DCCReference Include="..\Extensions\HashXMD5.pas"/>
         <DCCReference Include="..\Controller\Controller.Auth.pas"/>
         <DCCReference Include="..\Controller\Controller.Notificacoes.pas"/>
         <DCCReference Include="..\controller\Controller.Usuario.pas"/>
@@ -317,6 +317,10 @@
         <DCCReference Include="..\Sql\SQL.Pedido.pas"/>
         <DCCReference Include="..\SQL\SQL.Cliente.pas"/>
         <DCCReference Include="..\SQL\SQL.Usuario.pas"/>
+        <DCCReference Include="..\Extensions\Constants.pas"/>
+        <DCCReference Include="..\SQL\SQL.Produto.pas"/>
+        <DCCReference Include="..\Repository\Interfaces\Repository.Interfaces.IProdutoRepository.pas"/>
+        <DCCReference Include="..\Repository\Classes\Repository.Classes.ProdutoRepository.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

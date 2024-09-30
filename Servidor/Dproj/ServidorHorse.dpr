@@ -5,9 +5,9 @@ uses
   FMX.Forms,
   UnitPrincipal in '..\fonte\UnitPrincipal.pas' {frmPrincipal},
   DM.Conexao in '..\DataModule\DM.Conexao.pas' {DMConexao: TDataModule},
-  Utilitarios in '..\Utils\Utilitarios.pas',
+  Utilitarios in '..\Extensions\Utilitarios.pas',
   Server.Horse in '..\Fonte\Server.Horse.pas',
-  HashXMD5 in '..\Utils\HashXMD5.pas',
+  HashXMD5 in '..\Extensions\HashXMD5.pas',
   Controller.Auth in '..\Controller\Controller.Auth.pas',
   Controller.Notificacoes in '..\Controller\Controller.Notificacoes.pas',
   Controller.Usuario in '..\controller\Controller.Usuario.pas',
@@ -44,7 +44,11 @@ uses
   SQL.Notificacoes in '..\SQL\SQL.Notificacoes.pas',
   SQL.Pedido in '..\Sql\SQL.Pedido.pas',
   SQL.Cliente in '..\SQL\SQL.Cliente.pas',
-  SQL.Usuario in '..\SQL\SQL.Usuario.pas';
+  SQL.Usuario in '..\SQL\SQL.Usuario.pas',
+  Constants in '..\Extensions\Constants.pas',
+  SQL.Produto in '..\SQL\SQL.Produto.pas',
+  Repository.Interfaces.IProdutoRepository in '..\Repository\Interfaces\Repository.Interfaces.IProdutoRepository.pas',
+  Repository.Classes.ProdutoRepository in '..\Repository\Classes\Repository.Classes.ProdutoRepository.pas';
 
 {$R *.res}
 

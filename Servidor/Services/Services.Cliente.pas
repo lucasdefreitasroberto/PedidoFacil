@@ -20,7 +20,8 @@ uses
   Classe.Conexao,
   Validations.Cliente,
   Repository.Classes.ClienteRepository,
-  Repository.Interfaces.IClienteRepository;
+  Repository.Interfaces.IClienteRepository,
+  Constants;
 
 type
   IServicesCliente = interface
@@ -40,9 +41,6 @@ type
     function SInserirCliente(Req: THorseRequest): TJSONObject;
     class function New: IServicesCliente;
   end;
-
-const
-  QTD_REG_PAGINA_CLIENTE = 100; //Limite de Registro por Pagina
 
 implementation
 

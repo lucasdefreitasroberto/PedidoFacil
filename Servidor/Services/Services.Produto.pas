@@ -22,7 +22,10 @@ uses
   Classe.Conexao,
   Validations.Produto,
   Horse.Upload,
-  FMX.Graphics;
+  FMX.Graphics,
+  Constants,
+  Repository.Interfaces.IProdutoRepository,
+  Repository.Classes.ProdutoRepository;
 
 type
   TProdutoData = record
@@ -35,32 +38,57 @@ type
   end;
 
 type
-  TServicesProduto = class(TDMConexao)
+  IServiceProduto = interface
+    ['{37433ADC-CDB7-4680-810D-466F6EB59582}']
+    function SListarProdutos(Req: THorseRequest): TJSONArray;
+  end;
+
+
+type
+  TServicesProduto = class(TInterfacedObject, IServiceProduto)
   private
+    FProdutoRepository : IProdutoRepository;
     function SQLInsertProduto: string;
     function SQLUpdateProduto: string;
-    function SQLListarProduto: string;
     function SQLListarFotoProduto: string;
     function SQLEditarFotoProduto: string;
     function ExtrairProdutoData(const Aproduto: TJSONObject): TProdutoData;
   public
+    constructor Create;
+    destructor Destroy; override;
+    class function New: IServiceProduto;
+
     function SListarProdutos(Req: THorseRequest): TJSONArray;
     function SInserirProduto(Req: THorseRequest): TJSONObject;
     function SListarFotoProduto(CodProduto: integer): TMemoryStream;
     procedure SEditarFotoProduto(CodProduto: Integer; Foto: TBitmap);
   end;
 
-const
-  QTD_REG_PAGINA_PRODUTOS = 100; //Limite de Registro por Pagina
-
 implementation
 
 { TServicesProduto }
 
+constructor TServicesProduto.Create;
+begin
+  FProdutoRepository := TProdutoRepository.Create;
+end;
+
+destructor TServicesProduto.Destroy;
+begin
+  FProdutoRepository := nil;
+  inherited;
+end;
+
+class function TServicesProduto.New: IServiceProduto;
+begin
+  Result := Self.Create;
+end;
+
 {$REGION ' SListarProdutos '}
 function TServicesProduto.SListarProdutos(Req: THorseRequest): TJSONArray;
 var
-   LPagina : integer;
+   LPagina, LSkip: integer;
+   LDtUltSinc: string;
 begin
 
   try
@@ -69,27 +97,12 @@ begin
     LPagina := 1;
   end;
 
-  var
   LSkip := (LPagina * QTD_REG_PAGINA_PRODUTOS) - QTD_REG_PAGINA_PRODUTOS;
 
-  var
-  LDtUltSincronizacao := Req.Query['dt_ult_sincronizacao'];
-  TDtUltSincVaziaValidation.New(LDtUltSincronizacao).Validate;
+  LDtUltSinc := Req.Query['dt_ult_sincronizacao'];
+  TDtUltSincVaziaValidation.New(LDtUltSinc).Validate;
 
-  var
-  FQuery := TQueryFD.Create;
-  try
-    Result := FQuery
-                .SQL(Self.SQLListarProduto())
-                .Params('FIRST', QTD_REG_PAGINA_PRODUTOS)
-                .Params('SKIP', LSkip)
-                .Params('DATA_ULT_ALTERACAO', LDtUltSincronizacao)
-                .Open
-                .ToJSONArray;
-  finally
-    FQuery.Free;
-  end;
-
+  Result := FProdutoRepository.RListarProdutos(QTD_REG_PAGINA_PRODUTOS, LSkip, LDtUltSinc);
 end;
 {$ENDREGION}
 
@@ -148,23 +161,6 @@ begin
 end;
 {$ENDREGION}
 
-{$REGION ' SQL-ListarProduto '}
-function TServicesProduto.SQLListarProduto: string;
-begin
-  Result := ' select first :FIRST skip :SKIP'+
-            ' COD_PRODUTO,'+
-            ' DESCRICAO,'+
-            ' VALOR,'+
-            ' FOTO,'+
-            ' QTD_ESTOQUE,'+
-            ' COD_USUARIO,'+
-            ' DATA_ULT_ALTERACAO'+
-            ' from PRODUTO'+
-            ' where DATA_ULT_ALTERACAO > :DATA_ULT_ALTERACAO'+
-            ' order by COD_PRODUTO';
-end;
-{$ENDREGION}
-
 {$REGION ' SQL-InsertSQLProduto '}
 function TServicesProduto.SQLInsertProduto: string;
 begin
@@ -197,9 +193,11 @@ function TServicesProduto.SListarFotoProduto(CodProduto: Integer): TMemoryStream
 var
   FQuery: TFDQuery;
   LStream: TStream;
+  DMConexao: TDMConexao;
 begin
   FQuery := TFDQuery.Create(nil);
-  FQuery.Connection := Self.con;
+  DMConexao := TDMConexao.Create;
+  FQuery.Connection := DMConexao.con;
   try
     with FQuery do
     begin
@@ -227,6 +225,7 @@ begin
     end;
   finally
     FQuery.Free;
+    DMConexao.Free;
   end;
 end;
 
@@ -238,7 +237,7 @@ var
   FQuery: TFDQuery;
 begin
   FQuery := TFDQuery.Create(nil);
-  FQuery.Connection := Self.con;
+  FQuery.Connection := DMConexao.con;
   try
 
     with FQuery do

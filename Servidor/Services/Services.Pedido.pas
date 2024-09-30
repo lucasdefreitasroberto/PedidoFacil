@@ -9,7 +9,8 @@ uses
   Repository.Classes.PedidoRepository,
   Controller.Auth,
   Validations.Pedido,
-  DM.Conexao;
+  DM.Conexao,
+  Constants;
 
   type
   IServicesPedido = interface(IInterface)
@@ -35,9 +36,6 @@ implementation
 
 uses
   System.SysUtils;
-
-const
-  QTD_REG_PAGINA_PEDIDO = 100;
 
 constructor TServicesPedido.Create;
 begin

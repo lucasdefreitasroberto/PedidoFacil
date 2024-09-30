@@ -15,7 +15,8 @@ uses
   Services.Produto,
   IdSSLOpenSSLHeaders,
   System.Classes,
-  Horse.Upload;
+  Horse.Upload,
+  Classes.Handler;
 
 procedure RegistrarRotas;
 
@@ -25,28 +26,12 @@ uses
   FMX.Graphics;
 
 {$REGION ' CListarProduto '}
-
 procedure CListarProduto(Req: THorseRequest; Res: THorseResponse; Next: TProc);
-var
-  LService : TServicesProduto;
-  LJsonRetorno : TJSONArray;
 begin
-  LService := TServicesProduto.Create;
-  try
-
-    try
-      LJsonRetorno := LService.SListarProdutos(Req);
-      Res.Send<TJSONArray>(LJsonRetorno).Status(THTTPStatus.OK);
-    except
-      on ex: Exception do
-        Res.Send(ex.Message).Status(500);
-    end;
-
-  finally
-    FreeAndNil(LService);
-  end;
+  TRequestHandler<TJSONArray>
+    .New(TServicesProduto.New.SListarProdutos(Req))
+    .HandleRequestAndRespond(Req, Res);
 end;
-
 {$ENDREGION}
 
 {$REGION ' CInserirProduto '}
