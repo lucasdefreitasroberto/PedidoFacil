@@ -28,35 +28,21 @@ uses
   Repository.Classes.ProdutoRepository;
 
 type
-  TProdutoData = record
-    CodProdutoLocal: Integer;
-    Descricao: string;
-    Valor: Double;
-    Qtdstoque: Double;
-    DataUltAlteracao: string;
-    CodProdutoOficial: Integer;
-  end;
-
-type
-  IServiceProduto = interface
+  IServiceProdutoAbstract = interface
     ['{37433ADC-CDB7-4680-810D-466F6EB59582}']
     function SListarProdutos(Req: THorseRequest): TJSONArray;
+    function SInserirProduto(Req: THorseRequest): TJSONObject;
   end;
 
 
 type
-  TServicesProduto = class(TInterfacedObject, IServiceProduto)
+  TServicesProduto = class(TInterfacedObject, IServiceProdutoAbstract)
   private
-    FProdutoRepository : IProdutoRepository;
-    function SQLInsertProduto: string;
-    function SQLUpdateProduto: string;
-    function SQLListarFotoProduto: string;
-    function SQLEditarFotoProduto: string;
-    function ExtrairProdutoData(const Aproduto: TJSONObject): TProdutoData;
+    FProdutoRepository : IProdutoRepositoryAbstract;
   public
     constructor Create;
     destructor Destroy; override;
-    class function New: IServiceProduto;
+    class function New: IServiceProdutoAbstract;
 
     function SListarProdutos(Req: THorseRequest): TJSONArray;
     function SInserirProduto(Req: THorseRequest): TJSONObject;
@@ -65,6 +51,9 @@ type
   end;
 
 implementation
+
+uses
+  SQL.Produto;
 
 { TServicesProduto }
 
@@ -79,7 +68,7 @@ begin
   inherited;
 end;
 
-class function TServicesProduto.New: IServiceProduto;
+class function TServicesProduto.New: IServiceProdutoAbstract;
 begin
   Result := Self.Create;
 end;
@@ -108,8 +97,6 @@ end;
 
 {$REGION ' SInserirProduto '}
 function TServicesProduto.SInserirProduto(Req: THorseRequest): TJSONObject;
-var
-  LSQL : string;
 begin
   var
   LProduto := Req.Body<TJSONObject>;
@@ -117,74 +104,7 @@ begin
   var
   LCodigoUsuario := Controller.Auth.Get_Usuario_Request(Req);
 
-  var
-  LProdutoDados := Self.ExtrairProdutoData(LProduto);
-
-  TDescVazioValidation.New(LProdutoDados.Descricao);
-
-  if LProdutoDados.CodProdutoOficial = 0 then
-    LSQL := Self.SQLInsertProduto
-  else
-    LSQL := Self.SQLUpdateProduto;
-
-  var
-  FQuery := TQueryFD.Create;
-  try
-    Result :=
-      FQuery
-        .SQL(LSQL)
-        .Params('COD_USUARIO', LCodigoUsuario)
-        .Params('COD_PRODUTO', LProdutoDados.CodProdutoOficial)
-        .Params('DESCRICAO',   LProdutoDados.Descricao)
-        .Params('VALOR',       LProdutoDados.Valor)
-        .Params('QTD_ESTOQUE', LProdutoDados.Qtdstoque)
-        .Params('DATA_ULT_ALTERACAO',LProdutoDados.DataUltAlteracao)
-        .Open
-        .ToJSONObject
-        .AddPair('cod_produto_local', TJSONNumber.Create(LProdutoDados.CodProdutoLocal)); {"cod_produto: 50, "cod_produto_local": 123}
-  finally
-    FQuery.Free;
-  end;
-
-end;
-{$ENDREGION}
-
-{$REGION ' ExtrairProdutoData '}
-function TServicesProduto.ExtrairProdutoData(const Aproduto: TJSONObject): TProdutoData;
-begin
-  Result.CodProdutoLocal   :=  Aproduto.GetValue<Integer>('COD_PRODUTO_LOCAL', 0);
-  Result.Descricao         :=  Aproduto.GetValue<string>('DESCRICAO', '');
-  Result.Valor             :=  Aproduto.GetValue<Double>('VALOR', 0);
-  Result.Qtdstoque         :=  Aproduto.GetValue<Double>('QTD_ESTOQUE', 0);
-  Result.DataUltAlteracao  :=  Aproduto.GetValue<string>('DATA_ULT_ALTERACAO', '');
-  Result.CodProdutoOficial :=  Aproduto.GetValue<Integer>('COD_PRODUTO_OFICIAL', 0);
-end;
-{$ENDREGION}
-
-{$REGION ' SQL-InsertSQLProduto '}
-function TServicesProduto.SQLInsertProduto: string;
-begin
-  Result :=
-    ' insert into PRODUTO (COD_PRODUTO, COD_USUARIO, DESCRICAO, VALOR, FOTO, QTD_ESTOQUE, DATA_ULT_ALTERACAO) '+
-    ' values (:COD_PRODUTO, :COD_USUARIO, :DESCRICAO, :VALOR, :FOTO, :QTD_ESTOQUE, :DATA_ULT_ALTERACAO) '+
-    ' returning COD_PRODUTO ';
-end;
-
-{$ENDREGION}
-
-{$REGION ' SQL-UpdateProduto '}
-function TServicesProduto.SQLUpdateProduto: string;
-begin
-  Result :=
-    ' update PRODUTO '+
-    ' set COD_USUARIO = :COD_USUARIO, '+
-    ' DESCRICAO = :DESCRICAO, '+
-    ' VALOR = :VALOR, '+
-    ' FOTO = :FOTO, '+
-    ' QTD_ESTOQUE = :QTD_ESTOQUE, '+
-    ' DATA_ULT_ALTERACAO = :DATA_ULT_ALTERACAO '+
-    ' where (COD_PRODUTO = :COD_PRODUTO) '+
-    ' returning COD_PRODUTO ';
+  Result := FProdutoRepository.RInserirProduto(LCodigoUsuario, LProduto);
 end;
 {$ENDREGION}
 
@@ -194,16 +114,18 @@ var
   FQuery: TFDQuery;
   LStream: TStream;
   DMConexao: TDMConexao;
+  LSQL: string;
 begin
   FQuery := TFDQuery.Create(nil);
   DMConexao := TDMConexao.Create;
   FQuery.Connection := DMConexao.con;
+  LSQL := SQL.Produto.sqlListarFotoProduto;
   try
     with FQuery do
     begin
       Active := False;
       SQL.Clear;
-      SQL.Add(Self.SQLListarFotoProduto);
+      SQL.Add(LSQL);
       ParamByName('COD_PRODUTO').AsInteger := CodProduto;
       Active := True;
 
@@ -235,16 +157,20 @@ end;
 procedure TServicesProduto.SEditarFotoProduto(CodProduto: Integer; Foto: TBitmap);
 var
   FQuery: TFDQuery;
+  DMConexao: TDMConexao;
+  LSQL: string;
 begin
   FQuery := TFDQuery.Create(nil);
+  DMConexao := TDMConexao.Create;
   FQuery.Connection := DMConexao.con;
+  LSQL := SQL.Produto.sqlEditarFotoProduto;
   try
 
     with FQuery do
     begin
       Active := False;
       SQL.Clear;
-      SQL.Add(Self.SQLEditarFotoProduto);
+      SQL.Add(LSQL);
       ParamByName('FOTO_PRODUTO').Assign(Foto);
       ParamByName('COD_PRODUTO').Value := CodProduto;
       ExecSQL;
@@ -252,30 +178,9 @@ begin
 
   finally
     FQuery.Free;
+    DMConexao.Free;
   end;
 end;
-{$ENDREGION}
-
-{$REGION ' SQL-ListarFotoProduto '}
-function TServicesProduto.SQLListarFotoProduto: string;
-begin
-  Result :=
-  ' select ' +
-  ' FOTO ' +
-  ' from PRODUTO ' +
-  ' where COD_PRODUTO = :COD_PRODUTO ';
-end;
-{$ENDREGION}
-
-{$REGION ' SQL-EditarProduto '}
-function TServicesProduto.SQLEditarFotoProduto: string;
-begin
-  Result :=
-  ' update PRODUTO '+
-  ' set PRODUTO.FOTO = :FOTO_PRODUTO '+
-  ' where PRODUTO.COD_PRODUTO = :COD_PRODUTO ';
-end;
-
 {$ENDREGION}
 
 end.

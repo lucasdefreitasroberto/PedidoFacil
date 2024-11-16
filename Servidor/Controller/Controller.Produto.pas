@@ -35,28 +35,12 @@ end;
 {$ENDREGION}
 
 {$REGION ' CInserirProduto '}
-
 procedure CInserirProduto(Req: THorseRequest; Res: THorseResponse; Next: TProc);
-var
-  LService : TServicesProduto;
-  LJsonRetorno : TJSONObject;
 begin
-  LService := TServicesProduto.Create;
-  try
-
-    try
-      LJsonRetorno := LService.SInserirProduto(Req);
-      Res.Send<TJSONObject>(LJsonRetorno).Status(THTTPStatus.OK);
-    except
-      on ex: Exception do
-        Res.Send(ex.Message).Status(500);
-    end;
-
-  finally
-    FreeAndNil(LService);
-  end;
+  TRequestHandler<TJSONObject>
+  .New(TServicesProduto.New.SInserirProduto(Req))
+  .HandleRequestAndRespond(Req, Res);
 end;
-
 {$ENDREGION}
 
 {$REGION ' CListarFotoProduto '}
