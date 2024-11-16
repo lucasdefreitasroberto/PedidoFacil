@@ -22,23 +22,7 @@ implementation
 
 {$REGION ' CListarNotificacoes '}
 procedure CListarNotificacoes(Req: THorseRequest; Res: THorseResponse; Next: TProc);
-//var
-//  RequestHandler: IRequestHandler<TJSONArray>;
-//  ServicesPedido: IServicesNotificacoes;
 begin
-
-  {1}
-  // RequestHandler := TRequestHandler<TJSONArray>.Create(
-  // function(Req: THorseRequest): TJSONArray
-  // begin
-  // Result := TServicesNotificacoes.New.SListarNotificacoes(Req);
-  // end);
-
-  {2}
-  // RequestHandler := TRequestHandler<TJSONArray>.New(TServicesNotificacoes.New.SListarNotificacoes(Req));
-  // RequestHandler.HandleRequestAndRespond(Req, Res);
-
-  {3}
   TRequestHandler<TJSONArray>
     .New(TServicesNotificacoes.New.SListarNotificacoes(Req))
     .HandleRequestAndRespond(Req, Res);
