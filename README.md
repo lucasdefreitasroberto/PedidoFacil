@@ -1,3 +1,74 @@
+
+# API Pedido de Venda
+
+<h3>Bem-vindo.</h3>
+A API de Pedido de Venda, desenvolvida em Delphi com o framework Horse. Este projeto foi originalmente construído para atender a requisitos específicos de pedidos de venda. Embora a implementação não siga todos os princípios de design mais modernos e sólidos, ele continua funcional e útil para estudos ou para a construção de aplicações front-end que necessitem de uma API de backend básica porem com recursos mais elaborados.
+
+## Motivação
+
+Este projeto foi iniciado a muito tempo rsrsrs, antes de eu ter uma compreensão completa dos princípios de SOLID e da Clean Architecture. Com o tempo e a experiência, algumas das práticas aqui poderiam ser revisadas para uma melhor estruturação e modularidade. Apesar disso, a API cumpre seu propósito e pode servir de base para outros estudos e experimentos.
+
+## Tecnologias Utilizadas
+
+- **Linguagem:** Delphi
+- **Framework:** Horse
+- **Ferramenta de Teste:** Postman
+
+## Estrutura e Organização
+
+A API foi construída para oferecer funcionalidades básicas de pedidos de venda, com algumas regras de negócio específicas e validações simples. Portanto, evite julgar a forma como foi implementada; como mencionei, alguns processos foram feitos de maneiras que, com a experiência adquirida, eu certamente não utilizaria hoje.
+
+## Funcionalidades
+
+- Cadastro e edição de clientes
+- Listagem de clientes
+- Criação e atualização de pedidos de venda
+- Listagem e exclusão de pedidos de venda
+- Cadastro e edição de dados de usuários
+- Login de usuário com autenticação JWT
+- Notificação para usuário
+- Consulta do horário do servidor
+- Listagem e cadastro de condições de pagamento
+- Listagem e cadastro de produtos
+- Listagem e cadastro de fotos de produtos
+
+### Importante
+
+Essa API foi desenvolvida com propósitos específicos de negócio, com validações simplificadas. Não foram seguidos princípios avançados de arquitetura e design, mas a API está funcional e pode servir de ponto de partida para estudos.
+
+## Requisitos
+
+- Delphi
+- Framework Horse
+- Um cliente REST para testes (como Postman)
+
+## Instalação e Execução
+
+1. **Clone o repositório:**
+
+   ```bash
+   git clone https://github.com/lucasdefreitasroberto/PedidoFacil
+   ```
+
+2. **Instale as dependências necessárias do Delphi e Horse.**
+
+3. **Execute o projeto.**
+
+4. **Utilize o Postman (ou outra ferramenta) para testar a API com os endpoints disponíveis.**
+
+## Testes
+
+Testes básicos foram realizados com o Postman para validar as funcionalidades da API. Ela está funcional para os endpoints básicos, mas devido ao propósito inicial, não foram implementados testes automatizados ou avançados.
+
+## Considerações Finais
+
+Deixo esta API disponível para estudos e explorações. Ela pode ser utilizada como uma base de exemplo para aqueles que desejam construir uma aplicação de pedidos de venda ou necessitam de uma estrutura simples de backend. A implementação pode ser refinada e ajustada para melhor atender aos princípios de Clean Architecture e SOLID.
+
+---
+
+
+
+
 ## PedidoFacil
 
 **PedidoFacil** é um aplicativo móvel completo, desenvolvido para gerenciar pedidos de venda e cadastro de clientes. 
