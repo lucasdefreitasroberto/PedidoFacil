@@ -1,3 +1,5 @@
+# Este projeto foi iniciado a muito tempo 2019 ou 2020; quanto à conclusão... bem, talvez eu ainda esteja descobrindo! 😄
+<h3> Por favor, leia... </h3>
 
 # API Pedido de Venda
 
