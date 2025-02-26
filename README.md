@@ -1,5 +1,3 @@
-<h3> Por favor, leia... </h3>
-
 # API Pedido de Venda
 
 <h3>Bem-vindo.</h3>
